@@ -1,32 +1,36 @@
-# END-TO-END IMPLEMENTATION BRIEF — PREMIUM WEDDING PLANNER
+# END-TO-END IMPLEMENTATION BRIEF — APLIKASI PERENCANA PERNIKAHAN PRIBADI
 
-> Versi 3 (direvisi). Brief ini ditulis untuk **proyek Laravel baru yang terpisah**
-> dari repository portofolio `Fix-Portofolio`. Repository portofolio hanya menjadi
-> referensi pola (lihat Bagian 2.3) dan **tidak boleh diubah**.
+> Versi 4. Brief ini menggantikan versi sebelumnya (yang membayangkan layanan
+> wedding planner untuk banyak klien). Sekarang tujuannya: **aplikasi privat
+> untuk merencanakan pernikahan milik sendiri** — anggaran, timeline menuju
+> hari H (target sekitar **24 bulan dari sekarang**), dan vendor yang akan
+> dipakai. Ditulis untuk **proyek Laravel baru yang terpisah** dari repository
+> portofolio `Fix-Portofolio`; repo portofolio hanya referensi baca.
 
 ---
 
 ## 0. Perintah utama untuk AI Agent
 
 Bertindaklah sebagai **senior full-stack engineer, software architect,
-product designer, dan QA engineer**. Bangun aplikasi wedding planner yang
-benar-benar berjalan, rapi, aman, responsif, mudah dirawat, dan memiliki
-tampilan premium. Kerjakan secara end-to-end: periksa kondisi proyek,
-rencanakan, tulis kode, jalankan migrasi dan test, perbaiki error, lalu
-dokumentasikan cara menjalankannya.
+product designer, dan QA engineer**. Bangun aplikasi perencana pernikahan
+pribadi yang benar-benar berjalan, aman (berisi data keuangan & pribadi),
+nyaman dipakai di ponsel, dan berdesain tenang-premium. Kerjakan end-to-end:
+audit lingkungan, rencanakan, tulis kode, jalankan migrasi dan test, perbaiki
+error, lalu dokumentasikan cara menjalankannya.
 
-**Jangan berhenti pada rencana, mockup, atau halaman statis.** Implementasikan
-fitur nyata dengan database, validasi, otorisasi, state
-loading/error/empty, dan pengujian. Jangan mengklaim fitur selesai jika
-belum diimplementasikan **dan** diverifikasi.
+**Jangan berhenti pada rencana, mockup, atau halaman statis.** Fitur harus
+nyata: database, validasi, otorisasi, state loading/error/empty, dan test.
+Jangan mengklaim fitur selesai bila belum diimplementasikan **dan** diverifikasi.
 
 ### 0.1 Aturan kejujuran (berlaku di seluruh brief)
 
-- Jangan mengarang hasil test, skor performa, integrasi, data bisnis,
-  testimoni, rating, sertifikasi, atau jumlah klien.
-- Jika sebuah perintah tidak bisa dijalankan (dependency, kredensial,
-  jaringan, environment), tulis itu apa adanya di laporan akhir.
-- Konten demo harus selalu ditandai sebagai demo (lihat Bagian 6.3).
+- Jangan mengarang hasil test, skor performa, integrasi, atau harga.
+- **Jangan mengarang data vendor, harga pasar, atau aturan hukum/administrasi
+  pernikahan.** Semua angka harga berasal dari input pengguna. Template
+  anggaran/timeline hanyalah titik awal yang bisa diubah dan harus diberi
+  label "template umum, sesuaikan".
+- Bila sebuah perintah tidak bisa dijalankan (dependency, kredensial,
+  jaringan), tulis apa adanya di laporan akhir.
 
 ### 0.2 Wajib: skill UI/UX `ui-ux-promax` (gerbang desain, bukan saran)
 
@@ -50,16 +54,16 @@ brand ini, bukan keluaran generik AI ("AI slop", lihat Bagian 3.2).
 
 **Gerbang 2 — Hasilkan design system lewat skill.**
 1. Jalankan alur design-system milik skill (mis. pencarian/rekomendasi
-   desain dengan konteks: "wedding planner, luxury editorial, Indonesia")
+   desain dengan konteks: "aplikasi perencana pernikahan pribadi, editorial hangat dan tenang, mobile-first, Indonesia")
    dan **simpan hasilnya** sebagai sumber kebenaran, mengikuti pola
    yang sudah dipakai di repo portofolio:
    - `design-system/<nama-proyek>/MASTER.md` — aturan global (palet,
      tipografi, spacing, komponen, anti-pattern, checklist pra-pengiriman)
    - `design-system/<nama-proyek>/pages/<halaman>.md` — override per
-     halaman (landing, katalog, detail, booking, dashboard)
+     halaman (login, onboarding, dashboard, anggaran, timeline, vendor)
 2. Tetapkan **design dials** (mis. Variance / Motion / Density) dan
-   tuliskan alasannya untuk produk ini. Landing & katalog boleh lebih
-   ekspresif; booking & dashboard lebih tenang dan padat informasi.
+   tuliskan alasannya untuk produk ini. Halaman login/onboarding/countdown
+   boleh lebih ekspresif; anggaran, vendor, dan tabel lebih tenang dan padat informasi.
 3. Aturan di `MASTER.md` mengikat: bila halaman punya file override, file
    itu menang. Jika hasil skill bertentangan dengan brief ini, **brief ini
    menang untuk isi/fungsi dan skill menang untuk keputusan visual**,
@@ -87,8 +91,8 @@ Tidak ada nilai warna/ukuran acak di komponen.
 Sebelum menyatakan UI selesai:
 1. Jalankan checklist "pre-delivery" milik skill (bila ada) pada setiap halaman utama.
 2. Ambil **screenshot nyata** (Playwright/Chromium yang sudah tersedia) pada
-   360, 768, 1024, dan 1440 px untuk: homepage, daftar paket, katalog vendor,
-   detail vendor, form konsultasi, login, dashboard customer, dashboard admin.
+   360, 768, 1024, dan 1440 px untuk: onboarding, dashboard, anggaran, detail kategori anggaran,
+   timeline, daftar vendor, perbandingan kandidat vendor, tugas, login.
    Simpan di `docs/screenshots/`.
 3. **Lihat sendiri screenshot-nya** (buka gambarnya) dan nilai dengan
    daftar anti-slop di Bagian 3.2. Perbaiki setiap pelanggaran, ulangi
@@ -116,129 +120,124 @@ konsisten dan spesifik untuk produk ini.
 
 ## 1. Tujuan produk
 
-Website wedding planner dengan pengalaman digital yang **elegan, editorial,
-romantis, modern, premium, cepat, dan terpercaya**. Fondasinya harus bisa
-tumbuh dari website pemasaran menjadi layanan dengan katalog
-paket/vendor, konsultasi, booking, dan dashboard operasional.
+Satu tempat privat bagi dua orang (pemilik dan pasangan) untuk menjawab tiga
+pertanyaan sepanjang ±24 bulan persiapan:
 
-- Bahasa antarmuka: **Bahasa Indonesia** (microcopy hangat, jelas,
-  profesional). Pesan validasi server juga Bahasa Indonesia
-  (sediakan `lang/id`).
-- Mata uang **IDR**, format `Rp 12.500.000`. Tanggal/waktu locale `id`.
-- Zona waktu aplikasi dapat dikonfigurasi, default `Asia/Jakarta`.
-  Simpan timestamp di UTC, tampilkan di zona waktu aplikasi; tanggal acara
-  disimpan sebagai `date` (bukan timestamp) agar tidak bergeser zona.
-- Nama brand, logo, domain, kontak, WhatsApp, alamat, dan tautan sosial
-  **belum final**: simpan di tabel `site_settings` (dikelola admin) dengan
-  nilai default placeholder, bukan hard-coded di komponen.
-- Calon pelanggan Indonesia terbiasa dengan WhatsApp: sediakan tombol
-  "Hubungi via WhatsApp" yang nomornya dari `site_settings`, bukan
-  dari kode.
+1. **Uang** — berapa total yang dibutuhkan, dari mana dananya, berapa harus
+   ditabung per bulan, dan kapan setiap pembayaran jatuh tempo?
+2. **Waktu** — apa yang harus dikerjakan, kapan, dan apakah kita masih
+   sesuai jadwal menuju hari H?
+3. **Vendor** — vendor apa saja yang dibutuhkan, siapa kandidatnya, mana
+   yang dipilih, berapa harganya, dan sudah sejauh apa pembayarannya?
 
-### 1.1 Non-goals (di luar ruang lingkup versi ini)
+Rasa produk: **tenang, hangat, editorial, personal**. Bukan dashboard
+korporat, bukan marketplace. Dipakai terutama di **ponsel** (saat survei
+vendor, meeting, atau di wedding fair) dan laptop (saat menyusun anggaran).
 
-Agar scope tidak melebar, hal berikut **tidak dikerjakan** kecuali diminta
-kemudian: undangan digital & RSVP, manajemen daftar tamu, seating chart,
-marketplace dengan pembayaran antar-vendor, aplikasi mobile native,
-multi-bahasa/multi-tenant, chat real-time, review/rating vendor.
-Desain schema tidak boleh menutup kemungkinan fitur-fitur ini di masa depan.
+### 1.1 Fakta yang belum diketahui — jangan di-hardcode
+
+Semua hal berikut dimasukkan pengguna lewat **onboarding & halaman
+Pengaturan Pernikahan**, bukan ditulis di kode:
+
+- Nama kedua mempelai, panggilan, dan pengguna yang terhubung.
+- **Tanggal hari H**: bisa *belum pasti*. Simpan `target_date` (nullable) dan
+  `target_month` (perkiraan). Default saat onboarding: kira-kira 24 bulan
+  dari hari ini, bisa diubah. Semua countdown & timeline harus bekerja
+  dengan tanggal perkiraan dan menyesuaikan diri begitu tanggal pasti dipilih.
+- Kota/lokasi, perkiraan jumlah tamu, jumlah acara (akad/pemberkatan,
+  resepsi, ngunduh mantu, dll.), agama/adat yang memengaruhi template tugas.
+- Total anggaran (boleh kosong → aplikasi menampilkan total proyeksi dari
+  item yang diisi), sumber dana, dan tabungan awal.
+- Apakah honeymoon dan pre-wedding dihitung dalam anggaran.
+
+Bila data belum diisi, tampilkan empty state yang membantu ("Mulai dengan
+menentukan perkiraan jumlah tamu"), bukan angka nol yang menyesatkan.
+
+### 1.2 Bahasa & format
+Antarmuka **Bahasa Indonesia** (microcopy natural, tidak kaku). Mata uang
+**IDR** `Rp 12.500.000`; tanggal locale `id`; zona waktu default
+`Asia/Jakarta` (dapat dikonfigurasi). Timestamp di UTC; **hari H dan tenggat
+disimpan sebagai `date`**, bukan timestamp, agar tidak bergeser zona.
+
+### 1.3 Non-goals
+Bukan marketplace/pencarian vendor publik, tidak ada pemesanan vendor online,
+tidak ada pembayaran online atau penyimpanan data kartu, tidak ada scraping
+data vendor, tidak ada situs pemasaran publik, tidak ada chat real-time,
+tidak ada multi-tenant SaaS. Undangan digital/RSVP publik hanya Fase 3
+opsional. Skema tetap memakai `wedding_id` agar kelak bisa dikembangkan.
 
 ---
 
-## 2. Konteks proyek, stack, dan arsitektur
+## 2. Stack dan arsitektur
 
 ### 2.1 Keputusan yang sudah ditetapkan
 
 | Topik | Keputusan |
 | --- | --- |
-| Lokasi | Proyek Laravel **baru dan terpisah**, bukan di repo portofolio |
+| Lokasi | Proyek Laravel **baru dan terpisah** |
 | Frontend | React + TypeScript (strict) + Inertia.js |
 | Backend | Laravel stabil terbaru yang kompatibel dengan PHP di lingkungan |
-| Styling | Tailwind CSS (versi yang dibawa starter kit) |
-| UI primitives | shadcn/ui, hanya komponen yang dipakai, dikustomisasi sesuai brand |
-| Motion | Package `motion` (import dari `motion/react`), terpilih dan hemat |
-| Database | PostgreSQL (target utama, juga untuk test) |
-| Media | Cloudinary (foto, video, audio) |
-| Queue | Driver `database` (tanpa Redis di awal) |
-| Mata uang | IDR, disimpan sebagai **integer rupiah** (`unsignedBigInteger`) |
+| Styling | Tailwind CSS (versi starter kit) + shadcn/ui yang dikustomisasi |
+| Motion | Package `motion` (`motion/react`), hemat |
+| Database | PostgreSQL (juga untuk test) |
+| Media | Cloudinary (foto, dokumen/PDF; video & audio opsional) |
+| Queue | Driver `database`, tanpa Redis |
+| Uang | **Integer rupiah** (`unsignedBigInteger`), tanpa float |
+| Akses | Privat: hanya 2 pengguna terundang, tanpa pendaftaran publik |
 
-### 2.2 Bootstrap proyek
+### 2.2 Bootstrap
+1. Periksa `php -v`, `composer -V`, `node -v`, ketersediaan PostgreSQL.
+2. Buat proyek dengan **Laravel React Starter Kit** resmi; **baca dokumentasi
+   resmi saat itu**, jangan mengandalkan ingatan. Catat versi aktual
+   (Laravel, Inertia, React, Tailwind, shadcn/ui, Vite, SDK Cloudinary) di
+   `docs/ARCHITECTURE.md`.
+3. Pakai auth bawaan starter kit, **lalu matikan pendaftaran publik**
+   (route register dihapus/dikembalikan 404). Akun dibuat lewat perintah
+   artisan (`app:create-owner`, nilai dari prompt/env, bukan hard-coded) dan
+   pasangan ikut lewat tautan undangan (lihat 4.A).
+4. Inisialisasi Git, `.gitignore` benar, commit awal sebelum perubahan besar.
 
-1. Periksa versi PHP, Composer, Node, npm, dan ketersediaan PostgreSQL
-   (`php -v`, `composer -V`, `node -v`, `psql --version`).
-2. Buat proyek dengan **Laravel React Starter Kit** resmi
-   (`laravel new <nama> --react` atau `composer create-project` +
-   instalasi starter kit sesuai dokumentasi resmi saat itu). **Baca
-   dokumentasi resmi sebelum menjalankan perintah**; jangan mengandalkan
-   ingatan karena perintah/versi berubah.
-3. Catat versi aktual yang terpasang (Laravel, Inertia, React, Tailwind,
-   shadcn/ui, Vite, SDK Cloudinary) di `docs/ARCHITECTURE.md`.
-4. Gunakan sistem autentikasi yang dibawa starter kit; jangan menulis
-   ulang auth dari nol tanpa alasan teknis.
-5. Inisialisasi Git, `.gitignore` yang benar (`.env`, `vendor`,
-   `node_modules`, build output), dan commit awal sebelum perubahan besar.
-
-### 2.3 Referensi dari repo portofolio (opsional, hanya baca)
-
-Repo `Fix-Portofolio` sudah memiliki pola yang terbukti dan boleh dijadikan
-inspirasi (jangan salin mentah):
-
-- `app/Services/CloudinaryMediaService.php` — upload & destroy server-side.
-  **Catatan:** versi itu masih punya kekurangan yang harus diperbaiki di
-  proyek baru: tidak memvalidasi tipe/ukuran sendiri, tidak menangani
-  exception SDK, `destroy` diam-diam kembali bila konfigurasi kosong,
-  dan belum mendukung audio, signed upload, atau media privat.
-- `app/Http/Middleware/SecurityHeaders.php` — pola security headers.
-- Pola `throttle` pada form kontak dan login, serta halaman error 404/419/500.
-- `Dockerfile` & `compose.yaml` — pola environment Docker development.
-
-### 2.4 Aturan arsitektur
-
-- **Modular monolith**, satu repository, alur deploy sederhana. Bukan microservices.
-- Controller tipis → Form Request untuk validasi → Policy/Gate untuk
-  otorisasi → Service/Action untuk logika kompleks → Eloquent.
-- Jangan membuat abstraksi berlebihan (repository pattern, DTO, event)
-  kecuali kompleksitas nyata menuntutnya.
-- Eloquent relationships, constraint database, transaksi untuk operasi
-  atomik, pagination untuk daftar besar, eager loading untuk mencegah N+1.
-- Props Inertia: kirim hanya field yang dibutuhkan halaman (gunakan API
-  Resource/array eksplisit). **Jangan** mengirim model mentah yang
-  membocorkan kolom internal. Gunakan *shared data* secukupnya.
-- Inertia SSR: aktifkan hanya bila bisa diverifikasi berjalan
-  (`npm run build:ssr` + proses SSR). Jika tidak aktif, dokumentasikan dan
-  pastikan halaman publik tetap memiliki metadata via `<Head>`; jangan
-  mengklaim SSR/SEO yang tidak benar-benar aktif.
-- Jangan menambah Redis, search engine, atau layanan berbayar sejak awal.
-  Pencarian katalog cukup memakai query PostgreSQL (`ILIKE`, atau full-text
-  bila terbukti perlu).
-- Tidak ada REST API terpisah. Endpoint JSON hanya untuk kebutuhan
-  khusus (signature upload Cloudinary, webhook).
-- Jika perlu bantuan tipe route di frontend, gunakan fitur yang dibawa
-  starter kit (mis. Wayfinder) — jangan menulis URL string manual yang rawan salah.
+### 2.3 Aturan arsitektur
+- Modular monolith. Controller tipis → Form Request → Policy → Service/Action
+  untuk logika berhitung → Eloquent. Tanpa repository pattern/DTO/event
+  kecuali kompleksitas menuntut.
+- **Logika hitung (anggaran, rencana tabungan, penjadwalan ulang timeline)
+  ditaruh di class murni yang mudah diuji**, bukan di controller atau
+  komponen React. Frontend hanya menampilkan hasil dari backend; angka
+  tidak boleh dihitung ganda dengan rumus berbeda di dua tempat.
+- Semua query di-scope ke `wedding_id` milik pengguna (global scope atau
+  relasi eksplisit) + Policy. Eager loading untuk N+1; pagination bila daftar besar.
+- Props Inertia hanya berisi field yang dibutuhkan halaman (Resource/array eksplisit).
+- Tidak ada REST API terpisah. Endpoint JSON hanya untuk signature upload Cloudinary.
+- Jangan menambah Redis/search engine/layanan berbayar. Pencarian cukup SQL `ILIKE`.
+- Inertia SSR tidak dibutuhkan (aplikasi privat, `noindex`); jangan diaktifkan tanpa alasan.
+- Gunakan fitur tipe-route yang dibawa starter kit (mis. Wayfinder) bila ada.
 
 ---
 
 ## 3. Arah desain dan kualitas visual
 
 ### 3.1 Visual direction
+**Editorial hangat & tenang**, terasa seperti buku catatan pernikahan yang
+dirancang dengan baik — bukan spreadsheet dan bukan dashboard SaaS. Angka
+keuangan harus mudah dibaca dan menenangkan, bukan menakutkan.
 
-Gaya **editorial luxury wedding**: komposisi lapang, foto berkualitas
-tinggi, tipografi elegan, grid yang matang, detail halus, navigasi sederhana.
-
-Titik awal hipotesis — **keputusan final berasal dari `MASTER.md` hasil skill (Bagian 0.2) dan harus didokumentasikan alasannya**:
-
-- Warna dasar: warm ivory / off-white.
-- Teks: charcoal / warm black dengan kontras aksesibel.
-- Aksen hemat: muted champagne, soft taupe, atau sage.
-- Heading: serif elegan (font dengan lisensi bebas, mis. Google Fonts),
-  body/UI: sans-serif yang mudah dibaca. Pakai `font-display: swap`,
-  subset yang dibutuhkan, dan preload font kritis. Utamakan self-host
-  agar tidak bergantung CDN pihak ketiga.
-- Spacing rhythm, garis tipis, dan border-radius konsisten.
-- Definisikan **design tokens** (warna, tipografi, spacing, radius,
-  bayangan, durasi motion) di satu tempat (CSS variables/Tailwind theme),
-  lengkap dengan mode terang. Mode gelap opsional; jika tidak dibuat,
-  pastikan tidak ada komponen yang rusak karena preferensi sistem.
+Titik awal hipotesis — **keputusan final berasal dari `MASTER.md` hasil skill
+(Bagian 0.2) dan harus didokumentasikan alasannya**:
+- Warna dasar warm ivory; teks charcoal hangat; satu aksen hemat (champagne,
+  sage, atau terracotta lembut). Warna status anggaran (aman / mendekati /
+  melebihi) harus dapat dibedakan **tanpa bergantung pada warna saja**
+  (ikon/teks/pola).
+- Heading serif elegan, body/UI sans yang nyaman; angka memakai
+  `tabular-nums` agar kolom rapi. Font self-host, subset, `font-display: swap`.
+- Foto (moodboard, kunjungan vendor) jadi elemen visual; tata letak lapang
+  di halaman ringkasan, padat-rapi di tabel anggaran.
+- Design tokens (warna, tipografi, spacing, radius, bayangan, motion) di satu
+  tempat. Mode gelap opsional; jika tidak dibuat, pastikan tidak rusak.
+- Visualisasi data (grafik arus kas, donat alokasi anggaran, progres
+  timeline): bila skill `dataviz` tersedia, ikuti; grafik harus jujur
+  (sumbu mulai dari nol untuk batang), berlabel, dan aksesibel (ada ringkasan
+  teks/tabel alternatif).
 
 ### 3.2 Anti-AI-slop — daftar larangan yang diperiksa satu per satu
 
@@ -294,7 +293,7 @@ review** pada Gerbang 5; satu pelanggaran = belum selesai.
 **Komponen & dashboard**
 - Dashboard dan admin jangan terlihat seperti template admin bawaan
   (sidebar gelap + kartu statistik warna-warni). Pakai bahasa visual yang
-  sama dengan situs publik, lebih tenang dan padat; angka tampil dari data nyata.
+  sama dengan halaman lain, lebih tenang dan padat; angka tampil dari data nyata.
 - Komponen shadcn/ui **harus dikustomisasi** (radius, warna, tipografi,
   state fokus) sehingga tidak terlihat seperti tampilan default.
 - Form: label jelas, grup logis, ruang cukup, error dekat input; bukan
@@ -310,21 +309,17 @@ review** pada Gerbang 5; satu pelanggaran = belum selesai.
 
 - Template admin generik tanpa karakter; layout padat tanpa napas.
 - Gambar rusak, hotlink acak tak terverifikasi, URL tak berlisensi.
-- Semua halaman terlihat sama: landing, katalog, booking, dan dashboard
+- Semua halaman terlihat sama: dashboard, anggaran, timeline, dan vendor
   punya kebutuhan visual berbeda namun satu design system.
 - Mengorbankan aksesibilitas demi estetika.
 
-### 3.3 Aset gambar demo
-
-Agen mungkin tidak punya akses internet. Karena itu:
-
-- Utamakan aset **lokal** (komposisi SVG/CSS buatan sendiri, ilustrasi
-  sederhana, atau gambar berlisensi bebas yang disimpan di repo beserta
-  catatan lisensi di `docs/ASSETS.md`).
-- Setiap gambar demo harus memiliki `alt` bermakna, ukuran (width/height)
-  tetap, dan fallback saat gagal dimuat.
-- Jangan menyatakan foto demo sebagai karya klien nyata.
-- Foto asli milik bisnis diunggah kemudian lewat Cloudinary (Bagian 5).
+### 3.3 Aset gambar
+Aplikasi ini sebagian besar menampilkan foto milik pengguna. Karena itu:
+- Gunakan komposisi tipografi, ilustrasi SVG sederhana buatan sendiri, atau
+  aset berlisensi bebas (catat di `docs/ASSETS.md`). Tidak ada hotlink acak.
+- Empty state berupa ilustrasi/tipografi yang dirancang, bukan kotak abu-abu.
+- Semua gambar punya `alt` bermakna (kecuali dekoratif), width/height tetap,
+  dan fallback bila gagal dimuat.
 
 ### 3.4 Interaksi, responsive, dan aksesibilitas (target WCAG 2.2 AA)
 
@@ -351,529 +346,457 @@ Agen mungkin tidak punya akses internet. Karena itu:
 
 ## 4. Ruang lingkup fitur dan prioritas
 
-Kerjakan bertahap. **Selesaikan satu milestone penuh (database → backend →
-UI → test) sebelum memulai berikutnya.** Jika waktu/batas lingkungan habis,
-milestone yang selesai harus benar-benar berfungsi — lebih baik sedikit
-fitur yang lengkap daripada banyak fitur setengah jadi.
+Selesaikan satu milestone penuh (database → backend → UI → test) sebelum
+berikutnya. Lebih baik sedikit fitur yang lengkap daripada banyak yang setengah jadi.
 
-| Fase | Isi | Status wajib |
+| Fase | Isi | Status |
 | --- | --- | --- |
-| **MVP (wajib)** | Website publik, paket, katalog vendor (baca), portofolio, form konsultasi → lead, auth + role, dashboard admin (lead, paket, vendor, portofolio, FAQ, settings), manajemen media Cloudinary untuk foto | Harus selesai |
-| **Fase 2 (wajib bila MVP stabil)** | Dashboard customer (event, checklist, budget, saved vendor), booking + status workflow + riwayat, email notifikasi via queue | Diupayakan selesai |
-| **Fase 3 (opsional)** | Modul vendor (login & kelola profil), video/audio, media privat per event, integrasi payment sandbox | Hanya bila Fase 2 selesai dan stabil |
+| **MVP (wajib)** | Auth privat + undang pasangan, onboarding & pengaturan, dashboard, **anggaran**, **timeline & tugas**, **vendor** (kategori, kandidat, perbandingan, pilihan) | Harus selesai |
+| **Fase 2** | Jadwal pembayaran + pengingat, rencana tabungan lanjutan & arus kas, dokumen/kontrak privat (Cloudinary), catatan meeting, daftar tamu (jumlah & kelompok), moodboard, ekspor CSV/PDF & `.ics`, PWA installable | Diupayakan |
+| **Fase 3 (opsional)** | Tautan baca-saja untuk keluarga (cakupan terbatas), skenario anggaran (hemat/standar/premium), undangan digital/RSVP, audio/video | Hanya bila Fase 2 stabil |
 
-Laporkan dengan jelas fase mana yang selesai, sebagian, atau belum.
+### A. Akun, akses, dan pasangan (MVP)
+- Tidak ada pendaftaran publik. Hanya anggota workspace (`weddings` ↔
+  `wedding_members`) yang bisa masuk. Role: `owner` dan `partner` (hak akses
+  data sama; hanya `owner` yang dapat mengundang/mengeluarkan anggota dan
+  menghapus workspace).
+- Undangan pasangan: tautan bertanda tangan, **sekali pakai, kedaluwarsa**
+  (mis. 7 hari, dapat dicabut), pasangan menetapkan password sendiri.
+- Login, logout, reset password; **2FA** diaktifkan/ditawarkan bila starter
+  kit mendukung (disarankan keras karena data keuangan). Rate limit login,
+  session aman, regenerasi session saat login.
+- Hapus akun/ekspor semua data oleh pemilik (lihat 7).
 
-### A. Website publik (MVP)
+### B. Onboarding & pengaturan pernikahan (MVP)
+Wizard ringkas 4–5 langkah yang boleh dilewati sebagian: nama & pasangan →
+perkiraan tanggal/bulan (default ~24 bulan dari sekarang) → kota & jumlah
+tamu → total anggaran (opsional) & sumber dana → pilih agama/adat & acara
+(menentukan template tugas) → ringkasan. Setelah selesai, sistem membuat
+**template** kategori anggaran, tugas timeline, dan slot vendor (lihat
+lampiran 4.G). Semua hasil template **dapat diedit/dihapus** dan ditandai
+`source = template`. Menjalankan ulang template tidak boleh menimpa data
+yang sudah diubah pengguna.
 
-1. **Homepage**: hero editorial + CTA, pengenalan layanan, paket
-   unggulan, portofolio/galeri, alur kerja, vendor/partner unggulan (bila
-   ada data), testimoni **hanya** berupa konten demo yang ditandai jelas
-   (atau disembunyikan bila belum ada data nyata), FAQ, CTA konsultasi,
-   footer lengkap (navigasi, kontak dari settings, sosial bila ada, tautan
-   kebijakan privasi).
-2. **Layanan/paket**: daftar, deskripsi, harga atau label "mulai dari"
-   hanya bila diisi, fasilitas, CTA; halaman detail; perbandingan fitur
-   bila berguna. Filter/sort hanya jika benar-benar bekerja.
-3. **Katalog vendor**: kategori (venue, katering, dekorasi,
-   foto/video, MUA, busana, hiburan, undangan, lainnya); pencarian,
-   filter kategori/lokasi/rentang harga sesuai data, pagination,
-   halaman detail. Filter disimpan di query string agar bisa dibagikan
-   dan tombol Back berfungsi. Tanpa rating/review palsu.
-4. **Portofolio/galeri**: kategori, gambar (video di Fase 3), detail proyek,
-   gambar responsif, lightbox aksesibel.
-5. **Konsultasi/kontak**: nama, kontak (email dan/atau WhatsApp — minimal
-   satu wajib), tanggal acara opsional, lokasi opsional, estimasi anggaran
-   opsional, catatan; **checkbox persetujuan pemrosesan data pribadi**;
-   validasi server-side; honeypot + rate limiting; feedback sukses/gagal;
-   simpan sebagai lead. Format nomor telepon Indonesia dinormalisasi.
-6. **Halaman wajib lain**: Kebijakan Privasi (draft yang mengacu pada
-   prinsip UU PDP Indonesia — tandai bahwa teks hukum final perlu ditinjau
-   pemilik bisnis), Syarat & Ketentuan, 404 bermerek.
-7. **SEO dasar**: `<title>` & description unik per halaman, canonical,
-   Open Graph + Twitter card, sitemap dinamis (paket, vendor,
-   portofolio yang `published`), `robots.txt`, URL berslug rapi,
-   JSON-LD hanya bila datanya nyata dan valid. Halaman auth/dashboard/admin
-   diberi `noindex`.
+### C. Dashboard (MVP)
+Satu layar yang menjawab "kita ada di mana?":
+- **Countdown** ke hari H (hari / minggu / bulan; bila tanggal belum pasti,
+  tampilkan "perkiraan ±N bulan" dengan jelas).
+- **Fase saat ini** di timeline (mis. "Menentukan venue") dan progres tugas fase itu.
+- **Ringkasan anggaran**: total proyeksi, sudah disepakati, sudah dibayar,
+  sisa yang harus disiapkan, status (aman / mendekati / melebihi).
+- **Rencana tabungan**: butuh berapa per bulan vs rencana setoran saat ini.
+- **Yang perlu perhatian**: tugas terlambat/minggu ini, pembayaran jatuh tempo
+  30 hari ke depan, kategori vendor yang sudah melewati waktu idealnya tapi
+  belum dipilih.
+- Pintasan cepat: tambah kandidat vendor, catat pembayaran, tambah tugas
+  (besar & mudah dijangkau di ponsel).
+- Semua angka dari data nyata; tanpa grafik/angka palsu.
 
-### B. Akun dan autentikasi (MVP)
+### D. Anggaran (MVP)
+Struktur: `Anggaran total` → `Kategori` → `Item`. Tiga angka berbeda per item
+(jangan dicampur):
+1. **Estimasi** — rencana/perkiraan (boleh berupa rentang min–maks).
+2. **Kesepakatan** — harga yang disepakati dengan vendor terpilih (otomatis
+   dari kandidat vendor yang dipilih, atau diisi manual).
+3. **Terbayar** — jumlah pembayaran yang sudah dicatat lunas.
 
-- Registrasi, login, logout, reset password, verifikasi email sesuai
-  starter kit. Verifikasi email diwajibkan hanya bila mail dikonfigurasi;
-  jika tidak, dokumentasikan.
-- 2FA untuk akun `admin` (aktifkan bila starter kit menyediakannya).
-- Kebijakan password kuat, rate limit login, session aman
-  (`secure`, `httponly`, `same_site`), regenerasi session saat login.
-- Pengguna dapat **mengedit profil, mengganti password, dan menghapus
-  akunnya sendiri** (dengan penanganan data terkait yang aman).
+**Rumus (wajib didokumentasikan di `docs/DATABASE.md` dan diuji):**
+- `proyeksi_item = kesepakatan ?? estimasi` (bila rentang, gunakan nilai
+  tengah untuk total dan tampilkan rentang terpisah).
+- `proyeksi_total = Σ proyeksi_item + dana_tak_terduga`.
+- `sisa_dibayar = Σ kesepakatan − Σ terbayar` (tidak boleh negatif tanpa
+  peringatan; pembayaran > kesepakatan ditandai).
+- `selisih_anggaran = anggaran_total − proyeksi_total`; status: aman bila
+  selisih ≥ 0; "mendekati" bila proyeksi ≥ 90% anggaran (ambang
+  dikonfigurasi); "melebihi" bila selisih < 0.
+- **Item per tamu** (`pricing_mode = per_guest`, mis. katering, souvenir):
+  `estimasi = harga_per_tamu × perkiraan_jumlah_tamu`. Mengubah jumlah tamu
+  menghitung ulang semua item per tamu. Tamu yang dihitung memakai satu
+  sumber (pengaturan pernikahan, atau jumlah daftar tamu bila Fase 2 aktif).
+- **Dana tak terduga**: persentase dari subtotal (default **5–10%**, bisa
+  diubah) sebagai baris tersendiri yang tidak bisa terhapus tanpa peringatan.
+- **Buffer kenaikan harga** (opsional, default 0%): persentase tambahan atas
+  item yang belum disepakati karena harga vendor dapat naik dalam 2 tahun.
+- **Alokasi awal (template, bukan standar)** saat total anggaran diisi —
+  titik awal umum yang harus diubah sesuai kebutuhan: venue + katering ~45%,
+  dekorasi ~10%, dokumentasi ~10%, rias & busana ~10%, hiburan/MC ~4%,
+  undangan & souvenir ~4%, seserahan/mahar/cincin ~7%, administrasi ~1%,
+  transport & akomodasi ~3%, dana tak terduga ~6%. Pembulatan: bilangan
+  bulat rupiah, sisa pembulatan masuk ke kategori terbesar sehingga jumlah
+  alokasi **selalu sama persis** dengan total. Bila honeymoon/pre-wedding
+  dihitung, mereka berupa kategori terpisah di luar alokasi di atas.
 
-#### Role & matriks hak akses
+**Sumber dana & rencana tabungan**
+- `Sumber dana`: nama (tabungan pribadi A/B, orang tua, bonus/THR, dll.),
+  jumlah terkumpul, target, dan kontribusi bulanan terencana.
+- `kebutuhan_per_bulan = max(0, proyeksi_total − Σ terkumpul) / sisa_bulan`
+  (`sisa_bulan` minimal 1; bila tanggal belum pasti pakai tanggal perkiraan;
+  bila hari H sudah lewat/hari ini, tampilkan sisa total, bukan pembagian nol).
+- Bandingkan dengan `Σ kontribusi_bulanan_terencana` → "sesuai jalur" atau
+  "kurang Rp X per bulan". Tampilkan juga **titik temu**: perkiraan kapan
+  dana terkumpul mencukupi bila setoran saat ini dipertahankan.
+- **Arus kas (Fase 2):** grafik dana yang dibutuhkan per bulan berdasarkan
+  jadwal pembayaran (DP biasanya jauh sebelum hari H); tandai bulan dengan
+  pengeluaran besar.
 
-Role: `admin`, `staff` (planner), `customer`, `vendor` (Fase 3).
-Gunakan enum PHP + kolom `role` pada `users` (cukup untuk 4 role; jangan
-memasang package permission kecuali ada kebutuhan granular nyata).
+**Pembayaran (Fase 2 penuh, model dasar di MVP)**
+- Setiap item/vendor punya jadwal pembayaran: label (DP, termin, pelunasan),
+  jumlah, tanggal jatuh tempo, status (`direncanakan`, `jatuh_tempo`,
+  `lunas`, `dibatalkan`), tanggal bayar, metode, catatan, bukti (media privat).
+- Pengingat jatuh tempo (in-app; email via queue **hanya jika mail dikonfigurasi**).
+- Mencatat pembayaran memperbarui "Terbayar" dalam transaksi database.
 
-| Aksi | admin | staff | customer | vendor | publik |
-| --- | --- | --- | --- | --- | --- |
-| Baca konten terpublikasi | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Kelola paket/vendor/portofolio/FAQ/settings | ✓ | – | – | – | – |
-| Kelola lead & booking | ✓ | ✓ (yang ditugaskan) | – | – | – |
-| Kelola pengguna & ubah role | ✓ | – | – | – | – |
-| Kelola event, task, budget miliknya | ✓ | ✓ (yang ditugaskan) | ✓ (miliknya) | – | – |
-| Kirim lead / booking | – | – | ✓ | – | lead saja |
-| Ubah profil vendor miliknya | ✓ | – | – | ✓ | – |
+### E. Timeline & tugas (MVP)
+- **Tiga tampilan**: *Roadmap* per fase (T-24 bulan sampai pasca-nikah),
+  *Kalender bulanan*, dan *Fokus* ("bulan ini/minggu ini").
+- Setiap tugas: judul, deskripsi, tenggat (`date`), status (`belum`,
+  `dikerjakan`, `selesai`, `dilewati`), prioritas, penanggung jawab (anggota
+  workspace), fase, relasi opsional ke kategori vendor/item anggaran,
+  `date_locked` (tenggat dikunci manual).
+- **Penjadwalan relatif hari H**: template tugas menyimpan `offset`
+  (mis. "24 bulan sebelum", "10 hari sebelum"). Tenggat dihitung dari tanggal
+  hari H. Ketika tanggal hari H diubah, aplikasi **menghitung ulang tenggat
+  tugas yang belum selesai & belum dikunci**, menampilkan pratinjau
+  perubahan, dan meminta konfirmasi sebelum menyimpan. Tugas selesai/dikunci
+  tidak berubah.
+- Jika waktu tersisa lebih pendek dari offset template (mis. tanggal
+  dimajukan), tugas yang tenggatnya sudah lewat ditandai "perlu dijadwal
+  ulang" — bukan diam-diam dipindah ke masa lalu.
+- Peringatan risiko: kategori vendor kritis belum dipilih padahal sudah
+  melewati "waktu ideal" (offset) ditampilkan di Dashboard.
+- Ekspor kalender `.ics` (unduhan, Fase 2). Tidak ada feed publik.
 
-Aturan: self-registration **selalu** menghasilkan `customer`. Role lain
-hanya dibuat/diubah oleh admin. Role tidak boleh bisa di-set lewat
-mass assignment. Admin pertama dibuat lewat seeder/command memakai
-variabel environment, **bukan** kredensial hard-coded, dan tidak
-dijalankan otomatis di production.
+### F. Vendor (MVP)
+**Kategori/slot vendor** (template, bisa ditambah, ditandai *dibutuhkan /
+tidak dibutuhkan / opsional*):
+- **Inti:** venue/gedung, katering, dekorasi & florist, dokumentasi
+  (foto & video), rias (MUA), busana pengantin (gaun/jas/kebaya/adat),
+  wedding organizer atau day-of coordinator.
+- **Pendukung:** MC, hiburan & musik, sound/lighting, undangan & cetak,
+  souvenir, cincin, seserahan & mahar, transportasi, akomodasi keluarga/tamu
+  luar kota, kue pernikahan/wedding cake, photobooth.
+- **Administrasi & prosesi:** KUA/catatan sipil/pemuka agama atau lembaga
+  terkait (lihat catatan hukum di 4.G).
+- **Opsional:** pre-wedding, honeymoon, hotel malam pertama, keamanan & parkir,
+  panitia keluarga.
 
-### C. Dashboard customer (Fase 2)
+**Alur per slot (pipeline)**: `belum_dicari` → `riset` → `shortlist` →
+`survei_terjadwal` → `sudah_survei` → `negosiasi` → `terpilih` →
+`dp_dibayar` → `lunas`. Status slot diturunkan dari kandidat terpilih &
+pembayarannya, bukan diisi manual yang bisa tidak konsisten.
 
-- Ringkasan acara dan progres persiapan.
-- Profil pasangan & detail acara: tanggal, lokasi, tipe acara, estimasi
-  tamu, anggaran.
-- Checklist/tugas dengan status, tenggat, dan template tugas awal yang
-  dapat disalin (seed) saat event dibuat.
-- Timeline/kalender acara.
-- Budget planner: kategori, estimasi, realisasi, sisa anggaran. Rumus
-  eksplisit di `docs/DATABASE.md` dan diuji (lihat Bagian 9). Realisasi
-  bisa melebihi estimasi → tampilkan status "melebihi anggaran" yang jelas.
-- Vendor/paket tersimpan.
-- Riwayat konsultasi & booking beserta statusnya.
-- Empty state yang membantu pengguna memulai.
+**Kandidat vendor** (`vendor_candidates`): nama, kategori, kota, kontak
+(telepon/WhatsApp, Instagram, situs — URL divalidasi), nama paket, **harga
+penawaran** (integer rupiah) + tanggal penawaran & masa berlaku, apa saja
+yang termasuk/tidak termasuk, kelebihan & kekurangan, sumber (rekomendasi,
+wedding fair, media sosial), skor pribadi per kriteria yang dapat diatur
+(mis. harga, kualitas, komunikasi, kecocokan gaya; 1–5), catatan, status
+(`shortlist`, `dihubungi`, `survei`, `negosiasi`, `terpilih`, `ditolak`).
+- **Hanya satu kandidat `terpilih` per slot** (unique partial index +
+  validasi). Memilih kandidat membuat/memperbarui "Kesepakatan" item anggaran
+  terkait (dengan konfirmasi) dan menawarkan jadwal pembayaran.
+- **Perbandingan berdampingan** (hingga 4 kandidat): harga, inklusi/eksklusi,
+  skor tertimbang, total proyeksi, selisih terhadap estimasi anggaran.
+  Di ponsel tampil sebagai kartu bertumpuk/gulir horizontal yang tetap terbaca.
+- **Catatan pertemuan/survei**: tanggal, catatan, foto (Cloudinary),
+  tindak lanjut → dapat dijadikan tugas dengan satu tindakan.
+- **Dokumen vendor** (kontrak, invoice, bukti bayar — Fase 2): media privat.
+- Tombol "WhatsApp" membuka `wa.me` dengan nomor yang dinormalisasi;
+  tautan eksternal memakai `rel="noopener noreferrer"`.
+- **Jangan mengisi data vendor nyata atau harga pasar sebagai seed.**
+  Kandidat selalu input pengguna. Data contoh hanya lewat factory untuk dev/test,
+  berlabel jelas dan tidak ikut seeder production.
 
-### D. Booking dan alur operasional (Fase 2)
+### G. Template awal (seed, dapat diubah)
+Label di UI: **"Template umum — sesuaikan dengan adat, agama, dan keluarga
+Anda."** Persyaratan administrasi/legal berbeda per agama, daerah, dan waktu;
+template hanya menulis tugas "cari tahu & verifikasi persyaratan resmi di
+KUA/catatan sipil/lembaga terkait", **tanpa menyebut aturan, durasi, atau
+biaya spesifik sebagai fakta**.
 
-- Hubungan entitas: **lead** (dari form publik, belum tentu punya akun) →
-  admin/staff dapat **mengonversi** lead menjadi akun customer + event +
-  booking; customer yang sudah login dapat membuat booking langsung.
-- Booking terkait ke `event` dan ke satu `package` (vendor sebagai
-  `booking_items` hanya bila benar-benar dibutuhkan).
-- Status & transisi **eksplisit** (tolak transisi lain dengan error jelas):
+Offset relatif hari H (T = hari H); fase dan angka hanya titik awal:
 
-| Dari | Ke yang diizinkan | Siapa |
+| Fase | Perkiraan waktu | Contoh tugas |
 | --- | --- | --- |
-| `pending` | `confirmed`, `cancelled` | admin/staff; `cancelled` juga customer |
-| `confirmed` | `in_progress`, `cancelled` | admin/staff; `cancelled` oleh customer sesuai kebijakan |
-| `in_progress` | `completed`, `cancelled` | admin/staff |
-| `completed` | — (final) | — |
-| `cancelled` | — (final) | — |
+| 1. Fondasi | T-24 s/d T-21 bln | Diskusi visi & restu keluarga; tetapkan perkiraan jumlah tamu; tetapkan total anggaran & sumber dana; buka rekening/pos tabungan khusus; tentukan pembagian peran dua keluarga |
+| 2. Konsep & riset | T-21 s/d T-18 bln | Tentukan gaya acara & prioritas (mana yang paling penting); riset venue; kunjungi wedding fair; buat daftar vendor yang dibutuhkan |
+| 3. Kunci yang langka | T-18 s/d T-14 bln | Survei & pilih venue (tanggal populer cepat penuh); tentukan tanggal final; pilih WO/koordinator bila dipakai; booking dokumentasi & katering bila terpisah |
+| 4. Vendor utama | T-14 s/d T-9 bln | Pilih rias, busana, dekorasi, MC/hiburan; jadwalkan pre-wedding; mulai daftar tamu awal |
+| 5. Detail | T-9 s/d T-6 bln | Desain undangan; souvenir; daftar seserahan; cincin; rencana akomodasi & transport |
+| 6. Administrasi | T-6 s/d T-3 bln | Cari tahu & lengkapi persyaratan resmi pernikahan; kursus/bimbingan pranikah bila relevan; cek kesehatan; fitting pertama |
+| 7. Finalisasi | T-3 s/d T-1 bln | Cetak & sebar undangan; konfirmasi kehadiran; tasting; rundown acara; fitting akhir; konfirmasi semua vendor |
+| 8. Minggu terakhir | T-4 minggu s/d H-1 | Pelunasan; gladi resik; siapkan amplop/pembayaran sisa; briefing keluarga & panitia; kemas kebutuhan |
+| 9. Hari H & sesudahnya | H s/d H+1 bln | Delegasikan tugas hari H; bayar sisa; kirim ucapan terima kasih; arsipkan dokumen & foto; evaluasi anggaran |
 
-- Setiap perubahan status ditulis ke `booking_status_histories`
-  (dari, ke, aktor, waktu, catatan) di dalam transaksi yang sama.
-- **Aturan konflik/duplikasi (default, dapat dikonfigurasi):**
-  1. Satu event tidak boleh punya dua booking aktif (`pending`/`confirmed`/
-     `in_progress`) untuk paket yang sama → unique partial index di PostgreSQL.
-  2. Kapasitas harian: maksimal N event `confirmed`/`in_progress` per tanggal
-     (default 1, dari `site_settings`). Cek dilakukan dalam transaksi dengan
-     penguncian (`lockForUpdate`) untuk mencegah race condition.
-  3. Tanggal acara di masa lalu ditolak.
-- Kebijakan pembatalan: simpan sebagai teks di settings; tidak ada
-  logika refund otomatis.
-- Email notifikasi lewat queue **hanya jika mail dikonfigurasi**.
-  Default dev: driver `log`/Mailpit. Jangan mengklaim email terkirim bila tidak ada provider.
-- Pembayaran online **bukan** prasyarat. Default: status pembayaran
-  manual (`unpaid`, `deposit_paid`, `paid`) yang diubah staff. Bila
-  mengintegrasikan gateway (Fase 3): gunakan sandbox resmi, verifikasi
-  signature webhook, idempotency key, transaksi DB, tidak menyimpan data
-  kartu, dan jangan percaya status dari browser.
-
-### E. Dashboard admin/staff (MVP + Fase 2)
-
-- Ringkasan lead, booking, paket, vendor, dan acara dari data nyata;
-  tanpa grafik/angka palsu — empty state yang jujur.
-- CRUD paket, kategori, vendor, portofolio, FAQ, lead, booking, media,
-  pengguna, dan `site_settings`.
-- Tabel: pagination server-side, pencarian/filter/sort yang benar-benar
-  bekerja, validasi, konfirmasi aksi destruktif, toast/feedback.
-- Detail lead/booking dengan alur perubahan status dan catatan internal.
-- Status publikasi (`draft`/`published`) untuk konten publik; hanya `published`
-  yang tampil di situs. Pratinjau draft hanya untuk admin.
-- Urutan tampil (sort order) dapat diatur untuk paket, FAQ, dan portofolio.
-- Log aktivitas ringan (`activity_logs`: aktor, aksi, subjek, waktu) untuk
-  aksi sensitif (ubah role, hapus data, ubah status booking).
-- Opsional: ekspor CSV lead.
-
-### F. Modul vendor (Fase 3, opsional)
-
-Profil & layanan vendor, area layanan, status approval
-(`pending_review`/`approved`/`rejected`), vendor hanya mengubah data
-miliknya (Policy), admin mengelola semua, dokumen/kontak privat tidak
-dibuka ke publik tanpa izin. Perubahan profil oleh vendor yang sudah
-`approved` memerlukan keputusan: default — langsung tayang kecuali field
-sensitif (nama, harga) yang kembali ke review.
+### H. Fase 2 & 3 singkat
+- **Daftar tamu (F2):** nama, kelompok/sisi keluarga, jumlah orang, status
+  undangan, catatan khusus (diet/akomodasi). Memberi angka tamu ke anggaran.
+  Tanpa seating chart.
+- **Moodboard (F2):** gambar (Cloudinary) + tag + tautan referensi (hanya
+  disimpan, tidak di-fetch server → hindari SSRF) + catatan palet warna.
+- **Catatan & keputusan (F2):** log keputusan keluarga ("kita sepakat X karena Y").
+- **Ekspor (F2):** CSV anggaran/vendor/tugas, PDF ringkasan anggaran, `.ics`, dan
+  ekspor penuh data (JSON) sebagai cadangan.
+- **PWA (F2):** manifest + ikon, dapat dipasang di layar utama ponsel;
+  offline penuh tidak wajib.
+- **Tautan baca-saja (F3):** token bertanda tangan, dapat dicabut, cakupan
+  dipilih (mis. hanya timeline & vendor, **anggaran tersembunyi secara default**).
 
 ---
 
 ## 5. Integrasi Cloudinary — wajib
 
-Cloudinary menyimpan dan mengirim **foto, video, dan audio**. Database
-hanya menyimpan metadata/referensi; tidak ada blob media di PostgreSQL.
+Cloudinary menyimpan **foto (moodboard, kunjungan vendor), dokumen PDF
+(kontrak, invoice, bukti bayar)**, dan opsional video/audio. Database hanya
+menyimpan metadata & referensi, tidak ada blob di PostgreSQL.
 
 ### 5.1 Implementasi
+- Satu service terpusat di balik interface kecil (`MediaStorage` →
+  `CloudinaryService`) agar controller tidak memegang detail SDK dan test
+  memakai fake. Gunakan SDK PHP resmi; **periksa dokumentasi & versi aktual
+  sebelum menulis kode**, jangan menebak API.
+- Konfigurasi lewat env, **satu bentuk yang konsisten**: `CLOUDINARY_URL`
+  *atau* tiga variabel `CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET`; plus
+  `CLOUDINARY_FOLDER` dan batas ukuran di `config/media.php`. Semua ada di
+  `.env.example` dengan nilai kosong/contoh (bukan host/ID nyata).
+- Hanya `cloud_name` yang boleh sampai ke browser. **API secret tidak pernah**
+  muncul di browser, repo, log, props Inertia, atau response.
+- Kredensial kosong → aplikasi tetap jalan; fitur unggah menampilkan pesan
+  konfigurasi yang jelas. Jangan berpura-pura upload berhasil.
 
-- Satu service terpusat (`App\Services\Media\CloudinaryService` atau
-  setara) di balik interface kecil, agar controller tidak memegang detail
-  SDK dan test bisa memakai fake.
-- Gunakan SDK PHP resmi Cloudinary (`cloudinary/cloudinary_php`). **Periksa
-  dokumentasi & versi SDK aktual** sebelum menulis kode; jangan menebak API.
-- Konfigurasi lewat environment. Pilih **satu** bentuk yang konsisten dan
-  dokumentasikan: `CLOUDINARY_URL` (format `cloudinary://key:secret@cloud`)
-  **atau** tiga variabel `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`,
-  `CLOUDINARY_API_SECRET`. Tambahkan juga `CLOUDINARY_FOLDER` (prefix root)
-  dan batas ukuran per tipe (lihat 5.3). Semua masuk `.env.example` dengan
-  nilai kosong/contoh.
-- Hanya `cloud_name` (publik) yang boleh sampai ke frontend. **API secret
-  tidak boleh** muncul di browser, repo, log, prop Inertia, atau response.
-- Bila kredensial kosong: aplikasi tetap berjalan; fitur upload
-  menampilkan pesan konfigurasi yang jelas (bukan error 500, bukan diam-diam
-  sukses). Jangan berpura-pura upload berhasil.
+### 5.2 Visibilitas — pada dasarnya SEMUA PRIVAT
+Aplikasi ini privat. Default semua aset **`type: authenticated`** dan
+dikirim lewat **signed URL berumur pendek** yang dibuat server setelah Policy
+lolos. Jangan simpan signed URL di database. Dokumen keuangan/kontrak tidak
+pernah publik. Periksa cara Cloudinary memperlakukan PDF (`image` vs `raw`)
+di dokumentasi resmi dan simpan `resource_type` sesuai kenyataan.
 
-### 5.2 Alur upload
+### 5.3 Alur upload
+1. Browser meminta signature ke endpoint server (terautentikasi, rate limited).
+2. Server memverifikasi anggota workspace, Policy atas subjek (vendor/item/
+   catatan), tipe, ukuran, dan **menentukan sendiri** folder
+   (`{CLOUDINARY_FOLDER}/weddings/{wedding-id}/...`) dan parameter yang
+   ditandatangani. Klien tidak boleh menyodorkan folder/`public_id`.
+3. Setelah upload, server **memverifikasi ulang ke Cloudinary** (aset ada,
+   folder benar, tipe/ukuran sesuai) sebelum menyimpan `media_assets`.
+4. Upload kecil via server: validasi MIME nyata dan ukuran; nama file asli
+   diabaikan.
+5. Aset yatim (terupload tapi tidak tersimpan) dibersihkan job terjadwal.
 
-Pilih dan dokumentasikan satu alur utama (default: **signed upload
-langsung dari browser** untuk file besar; upload via server untuk file kecil):
+### 5.4 Tipe & batas
+Foto: JPEG, PNG, WebP, AVIF. Dokumen: PDF. Video: MP4/WebM, audio:
+MP3/OGG/WAV (Fase 3; audio di Cloudinary bertipe `video`). Tolak
+executable, arsip, dan SVG unggahan. Batas ukuran per tipe dari config
+(jangan berasumsi batas paket Cloudinary).
 
-1. Browser meminta signature ke endpoint server (terautentikasi).
-2. Server memverifikasi: pengguna, policy atas subjek (event/vendor/
-   portofolio), `resource_type`, folder tujuan, format yang diizinkan,
-   ukuran maksimum. Server **menentukan sendiri** folder & parameter yang
-   ditandatangani; klien tidak boleh menyodorkan folder/public_id sembarang.
-3. Signature berumur pendek; hanya parameter yang ditandatangani yang berlaku.
-4. Setelah upload, klien mengirim hasil ke server. Server **memverifikasi
-   ulang ke Cloudinary** (mis. Admin API `resource`) bahwa aset itu ada,
-   berada di folder yang diharapkan, dan tipe/ukurannya sesuai — baru
-   menyimpan record `media_assets`. Jangan percaya `public_id`/URL dari klien.
-5. Upload via server: validasi MIME sebenarnya (bukan hanya ekstensi),
-   ukuran, dan nama file diabaikan (jangan memakai nama asli).
-6. Pertimbangkan webhook notifikasi Cloudinary (dengan verifikasi
-   signature) atau job pembersih terjadwal untuk menangani aset yatim
-   (terupload tetapi tidak pernah tersimpan di DB).
-
-### 5.3 Tipe media & batas
-
-- Foto: JPEG, PNG, WebP, AVIF.
-- Video: MP4, WebM.
-- Audio: MP3, OGG, WAV. **Catatan:** pada Cloudinary, audio ditangani
-  sebagai `resource_type: video`. Simpan `kind` (`image`/`video`/`audio`)
-  di tabel sendiri terpisah dari `resource_type` Cloudinary.
-- Batas ukuran per tipe dari `config/media.php` (env-overridable). Jangan
-  berasumsi batas paket Cloudinary — verifikasi atau buat configurable.
-- Tolak file executable/arsip/SVG upload dari pengguna (SVG berisiko XSS).
-
-### 5.4 Penyimpanan & struktur
-
-- Folder: `{CLOUDINARY_FOLDER}/portfolio`, `/vendors`, `/packages`,
-  `/events/{event-id}`, `/audio`.
-- Tabel `media_assets` (polymorphic `mediable_type`/`mediable_id` atau
-  relasional setara — pilih yang paling mudah dirawat dan jelaskan alasannya):
-  `provider`, `public_id` (unique), `kind`, `resource_type`,
-  `delivery_type` (`upload`/`authenticated`), `format`, `secure_url`,
-  `width`, `height`, `duration`, `bytes`, `alt_text`, `caption`,
-  `visibility` (`public`/`private`), `status`
-  (`pending`/`ready`/`failed`/`deleting`), `uploaded_by`, `sort_order`,
-  timestamps.
-- `alt_text` wajib untuk foto yang informatif di konten publik.
-
-### 5.5 Delivery & optimasi
-
-- Bangun URL lewat SDK/helper (jangan merangkai manual), memakai
-  `f_auto`, `q_auto`, dan lebar responsif (`srcset`/`sizes`). Komponen
-  `<CloudinaryImage>` di frontend harus menetapkan width/height (cegah CLS),
-  `loading="lazy"` di luar viewport, dan placeholder/blur ringan.
-- Thumbnail memakai transformasi kecil; jangan kirim full-resolution ke kartu.
-- Video: poster, `preload="metadata"`, tanpa autoplay bersuara.
-- **Media privat**: unggah dengan `type: authenticated` dan kirim lewat
-  **signed URL berumur pendek** yang dibuat server setelah Policy
-  lolos. Jangan simpan signed URL di DB.
-- Musik latar: **tidak autoplay bersuara**. Kontrol play/pause jelas,
-  dapat diakses keyboard, `aria-label`, hormati kebijakan browser, ingat
-  preferensi pengguna (mis. mute) secara lokal.
-
-### 5.6 Hapus & ganti
-
-- Hapus dilakukan lewat state machine: tandai `deleting` → hapus di
-  Cloudinary → hapus record. Jika Cloudinary gagal, record tetap
-  (`deleting`) dan dicoba ulang oleh job; log tanpa membocorkan secret.
-- Hanya pemilik/aktor berwenang (Policy) yang bisa menghapus. Server
-  mencari aset berdasarkan **ID record milik pengguna**, bukan menerima
-  `public_id` dari request. Tidak boleh menghapus aset milik pihak lain.
-- Mengganti media: unggah baru sukses dulu, baru hapus yang lama.
-- Tangani upload gagal, dibatalkan, file invalid, retry yang aman
-  (idempotent). Tidak boleh ada record setengah jadi.
-
-### 5.7 Dokumentasi & pengujian
-
-`docs/CLOUDINARY.md` memuat setup, alur, resource type, media privat,
-troubleshooting, dan cara menguji tanpa kredensial (fake). Test memakai
-fake/mocking sehingga tidak bergantung layanan eksternal.
+### 5.5 Penyimpanan, delivery, hapus
+- `media_assets`: `provider`, `public_id` (unique), `kind`
+  (`image`/`document`/`video`/`audio`), `resource_type`, `delivery_type`,
+  `format`, `width`, `height`, `bytes`, `alt_text`, `caption`, relasi
+  polymorphic ke vendor/pembayaran/catatan/moodboard, `uploaded_by`,
+  `status` (`pending`/`ready`/`failed`/`deleting`), timestamps.
+- Bangun URL lewat SDK (bukan string manual); `f_auto,q_auto`, lebar
+  responsif; thumbnail kecil untuk daftar; `loading="lazy"`; ukuran tetap
+  (cegah CLS).
+- Hapus: tandai `deleting` → hapus di Cloudinary → hapus record; bila gagal,
+  record tetap dan dicoba ulang job. Server mencari aset berdasarkan ID record
+  milik workspace, **bukan** menerima `public_id` dari request.
+- Mengganti media: unggah baru sukses dulu, baru hapus lama. Tidak ada record setengah jadi.
+- `docs/CLOUDINARY.md` memuat setup, alur, troubleshooting, dan cara menguji
+  tanpa kredensial (fake).
 
 ---
 
 ## 6. Database dan model domain
 
 ### 6.1 Prinsip
+PostgreSQL; foreign key, unique constraint, index (FK, kolom filter/sort,
+`wedding_id`), backed enum + cek DB bila praktis, timestamps, soft deletes
+hanya bila bermanfaat (mis. kandidat vendor yang ditolak tetap bisa dilihat).
+Uang **integer rupiah**. Migrasi reversible bila praktis, tidak mengedit
+migrasi lama yang sudah dipakai. Semua tabel data milik pengguna punya
+`wedding_id` dan di-scope.
 
-- PostgreSQL. Jangan membuat tabel hanya karena ada di daftar; buat yang
-  dibutuhkan alur nyata.
-- Foreign key, unique constraint, index (FK, slug, kolom filter/sort),
-  enum/status tervalidasi (PHP backed enum + cek di DB bila praktis),
-  timestamps, soft deletes hanya bila bermanfaat, aturan cascade aman.
-- Uang: integer rupiah (`unsignedBigInteger`) + kolom `currency` hanya bila
-  multi-currency benar-benar diperlukan; **bukan float/decimal bebas**.
-  Gunakan satu helper format/parse rupiah di backend dan frontend.
-- Slug unik untuk paket, vendor, portofolio; slug tidak berubah otomatis
-  saat judul diedit (hindari link rusak) kecuali eksplisit.
-- Migrasi harus reversible bila praktis, aman untuk data yang ada, dan
-  tidak mengedit migrasi lama yang sudah dipakai.
+### 6.2 Entitas
+`users`, `weddings` (nama pasangan, `target_date` nullable, `target_month`,
+timezone, kota, `guest_estimate`, `total_budget` nullable, persen dana tak
+terduga, persen buffer harga), `wedding_members` (role owner/partner),
+`invitations` (token hash, kedaluwarsa, sekali pakai), `budget_categories`,
+`budget_items` (`pricing_mode` fixed/per_guest, estimasi min/maks,
+kesepakatan, relasi opsional ke kandidat vendor), `funding_sources`,
+`funding_plans` (setoran bulanan terencana), `payments` (jadwal & realisasi),
+`vendor_slots` (kategori, `need` dibutuhkan/opsional/tidak), `vendor_candidates`,
+`vendor_scores` & `score_criteria`, `vendor_meetings`, `tasks`,
+`task_templates` (offset), `guests` & `guest_groups` (F2), `notes`,
+`media_assets`, `activity_logs` (aksi sensitif: ubah anggaran total, hapus,
+undang/keluarkan anggota, ganti tanggal hari H), plus tabel standar
+Laravel (`jobs`, `sessions`, `cache`, dll.).
+Buat hanya yang dibutuhkan fase yang sedang dikerjakan.
 
-### 6.2 Entitas yang dipertimbangkan
-
-`users`, `customer_profiles`, `events`, `event_staff` (penugasan staff),
-`packages`, `package_features`, `vendor_categories`, `vendors`,
-`vendor_services`, `portfolio_projects`, `media_assets`,
-`consultation_leads`, `bookings`, `booking_status_histories`, `tasks`,
-`budget_items`, `saved_vendors`, `faqs`, `testimonials` (dengan flag demo),
-`site_settings`, `activity_logs`, tabel `notifications` Laravel bila
-memakai notifikasi, `jobs`/`failed_jobs`/`cache`/`sessions` standar.
-
-### 6.3 Seeder & data demo
-
-- Dua jenis seeder: **`DemoSeeder`** (hanya dev/staging; aman dijalankan
-  ulang) dan **`ProductionSeeder`** (hanya data referensi: kategori vendor,
-  template task, settings default). Production tidak boleh otomatis
-  menjalankan DemoSeeder.
-- Semua baris demo memiliki `is_demo = true` (atau penanda setara) dan
-  label "Konten demo" di UI admin, sehingga mudah dihapus massal.
-- Akun demo (admin/staff/customer) hanya untuk lokal, kredensial dari
-  variabel environment, tidak pernah di-commit sebagai nilai nyata.
-- Factory untuk semua model utama dipakai test.
-- Tidak ada testimoni, nama klien, rating, atau statistik yang disajikan sebagai kenyataan.
+### 6.3 Seeder
+- `ProductionSeeder` / onboarding menyalin **template** (kategori anggaran,
+  slot vendor, tugas) ke workspace pengguna. Tanpa nama vendor, harga, atau
+  data pribadi.
+- Factory untuk semua model, dipakai test & data contoh lokal (berlabel
+  contoh; tidak dijalankan di production).
+- Tidak ada kredensial default. Akun pertama dibuat lewat perintah artisan.
 
 ---
 
 ## 7. Keamanan dan privasi
 
-- Ikuti praktik keamanan Laravel dan OWASP Top 10: CSRF, validasi server,
-  output escaping, mass-assignment protection, rate limiting (login, reset
-  password, form publik, endpoint signature upload), hash password.
-- **Rate limit default** (ubah bila ada alasan): login 5/menit per
-  email+IP, form konsultasi 5/10 menit per IP, signature upload 30/menit per user.
-- **IDOR**: tidak ada akses event, booking, task, budget, atau media milik
-  pengguna lain dengan mengganti ID. Gunakan Policy di setiap controller
-  dan query yang di-scope ke pemilik; uji dengan test eksplisit.
-- Authorization di backend untuk setiap aksi sensitif; UI hanya pelengkap.
-- **Security headers** (CSP yang kompatibel dengan Vite/Inertia, HSTS di
-  production, `X-Content-Type-Options`, `Referrer-Policy`,
-  `Permissions-Policy`, `frame-ancestors`). Sesuaikan CSP agar mengizinkan
-  domain Cloudinary untuk gambar/video/audio.
-- Cookie aman: `secure`, `httponly`, `same_site=lax` di production; `APP_DEBUG=false`.
-- Upload: batas ukuran/tipe, tolak executable, validasi MIME nyata.
-- Tidak ada secret di source, bundle frontend, commit, atau log. Jalankan
-  secret scan sederhana (mis. grep pola kunci) sebelum commit akhir.
-  `.env.example` hanya berisi nama variabel dan nilai kosong/contoh —
-  **jangan** mengisi host, username, atau project-id nyata.
-- Jangan me-log password, token, signed URL, atau data pribadi yang tidak perlu.
-  Mask nomor telepon/email di log bila perlu.
-- Halaman error aman tanpa stack trace di production.
-- **Privasi (UU PDP)**: persetujuan eksplisit di form, tautan kebijakan
-  privasi, tujuan penggunaan data jelas, kebijakan retensi lead
-  (mis. dapat dihapus oleh admin), pengguna dapat menghapus akun dan
-  meminta data dihapus; hanya kumpulkan data yang perlu.
-- Webhook (Cloudinary/payment): verifikasi signature, tolak replay,
-  idempotent.
-- `composer audit` dan `npm audit`: jalankan, laporkan temuan; jangan
-  mengabaikan secara diam-diam.
+Aplikasi ini menyimpan **data keuangan, kontrak, dan data pribadi dua
+keluarga**; perlakukan sebagai sensitif.
+
+- Semua halaman & endpoint di balik autentikasi, kecuali login/reset/terima
+  undangan. Tidak ada pendaftaran publik (uji bahwa route register 404).
+- **IDOR**: setiap query di-scope ke `wedding_id` anggota + Policy; uji
+  mengakses data workspace lain lewat ID → 403/404.
+- CSRF, validasi server-side (pesan Indonesia, `lang/id`), escaping, mass-assignment
+  protection, hash password, session aman (`secure`, `httponly`, `same_site`).
+- Rate limit: login 5/menit per email+IP; undangan & reset password;
+  signature upload 30/menit per user.
+- 2FA disarankan/diaktifkan; password kuat; sesi lama dicabut saat ganti password.
+- Token undangan/tautan baca-saja: acak kuat, simpan hash, kedaluwarsa, sekali pakai/dapat dicabut.
+- Header keamanan (CSP yang kompatibel Vite & mengizinkan Cloudinary, HSTS di
+  production, `X-Content-Type-Options`, `Referrer-Policy`, `frame-ancestors`),
+  `X-Robots-Tag: noindex` dan `robots.txt` disallow semua.
+- Tidak ada secret di source, bundle, commit, atau log; `.env.example` hanya
+  nama variabel & nilai kosong (jangan isi host/username/ID proyek nyata).
+  Lakukan secret scan sebelum commit akhir. Jangan log password, token,
+  signed URL, atau jumlah uang bersama identitas yang tak perlu.
+- Link eksternal (vendor/Instagram) divalidasi skema `http/https`, tampil
+  dengan `rel="noopener noreferrer"`; server **tidak** meng-fetch URL buatan pengguna.
+- Halaman error aman tanpa stack trace di production; `APP_DEBUG=false`.
+- **Cadangan**: dokumentasikan `pg_dump` terjadwal + uji restore; sediakan
+  ekspor data penuh (JSON/CSV) yang dapat diunduh pemilik.
+- Hak pengguna: pemilik dapat menghapus akun/workspace (hapus data + aset Cloudinary).
+- `composer audit` & `npm audit`: jalankan dan laporkan hasilnya.
 
 ---
 
-## 8. Performa dan SEO
+## 8. Performa
 
-Target (ukur, jangan klaim tanpa bukti):
-
-- LCP ≤ 2,5 dtk, CLS ≤ 0,1, INP ≤ 200 ms pada halaman publik utama
-  (kondisi mobile throttled bila alat tersedia).
-- Hindari N+1 (uji dengan `Model::preventLazyLoading()` di non-production
-  atau assertion jumlah query pada test kunci).
-- Pagination untuk semua daftar; indeks DB untuk kolom filter/sort.
-- Code-splitting per halaman (Inertia `resolve` dinamis), animasi & lightbox
-  dimuat lazy, tanpa dependency berat yang tidak perlu.
-- Lazy-load media di luar viewport; ukuran media ditetapkan; transformasi Cloudinary.
-- Font: self-host, subset, `font-display: swap`, preload yang kritis.
-- Cache hanya data aman (daftar publik, settings), dengan invalidasi saat
-  konten berubah. Mulai dengan cache `database`/`file`; jangan memasang Redis.
-- Jalankan `php artisan config:cache`, `route:cache`, `view:cache` di
-  dokumentasi deployment.
-- Bila Lighthouse/audit setara tersedia, jalankan untuk homepage,
-  katalog, dan detail; laporkan angka asli beserta keterbatasannya
-  (lab vs. lapangan). Jika tidak tersedia, tulis "tidak diukur".
+Target (ukur, jangan klaim tanpa bukti): LCP ≤ 2,5 dtk, CLS ≤ 0,1,
+INP ≤ 200 ms pada halaman utama di ponsel (throttled bila alat tersedia).
+Hindari N+1 (`preventLazyLoading` di non-production + assertion jumlah query
+pada halaman dashboard & anggaran). Code-splitting per halaman; grafik
+dimuat lazy; font self-host; media lazy dengan ukuran tetap. Cache hanya hal
+aman dan terinvalidasi; tanpa Redis. Dokumentasikan `config:cache`,
+`route:cache`, `view:cache`. Jika Lighthouse tersedia, jalankan untuk
+dashboard, anggaran, dan vendor; laporkan angka asli dan keterbatasannya,
+atau tulis "tidak diukur".
 
 ---
 
 ## 9. Testing dan quality gates
 
-### 9.1 Backend (PHPUnit atau Pest — pilih satu, ikuti starter kit)
-
-- Test memakai **PostgreSQL** (bukan SQLite) agar perilaku constraint,
-  partial index, dan `ILIKE` sama dengan produksi. Bila tidak tersedia,
-  catat sebagai keterbatasan.
-- Autentikasi & otorisasi per role (matriks Bagian 4B diuji).
-- Customer tidak bisa membaca/mengubah data customer lain (event, booking,
-  task, budget, media) — uji dengan ID milik pengguna lain → 403/404.
-- Role tidak bisa dinaikkan lewat request registrasi/profil (mass assignment).
-- CRUD inti beserta validasi (data valid, tidak valid, batas).
-- Transisi status booking: semua transisi valid & tidak valid;
-  duplikasi; kapasitas harian; race condition dasar bila bisa diuji.
-- Perhitungan budget (total estimasi, realisasi, sisa, melebihi anggaran,
-  nilai nol/kosong, pembulatan integer).
-- Cloudinary: logika signature, validasi parameter, verifikasi server,
-  penghapusan oleh pemilik vs bukan pemilik, kegagalan SDK — semua memakai fake.
-- Form konsultasi: validasi, honeypot, persetujuan, rate limiting (429).
-- Query count pada halaman katalog/detail (cegah N+1).
-- Halaman publik mengembalikan 200 dengan metadata; draft tidak bocor ke publik.
+### 9.1 Backend (PHPUnit/Pest sesuai starter kit; **test memakai PostgreSQL**)
+- **Anggaran**: proyeksi dengan/ tanpa kesepakatan, item per tamu & perubahan
+  jumlah tamu, rentang min–maks, dana tak terduga, buffer harga, alokasi
+  template (jumlah **tepat sama** dengan total, kasus pembulatan), status
+  aman/mendekati/melebihi, anggaran total kosong, nilai nol.
+- **Rencana tabungan**: sisa bulan = 0/1/negatif, tanpa tanggal hari H,
+  dana terkumpul ≥ kebutuhan, setoran kurang/lebih, titik temu.
+- **Pembayaran**: pembayaran > kesepakatan, pembatalan, sinkron "Terbayar" dalam transaksi.
+- **Timeline**: generasi tugas dari offset, perhitungan ulang saat hari H
+  berubah (hanya tugas belum selesai & belum dikunci), pratinjau perubahan,
+  tanggal dimajukan sehingga tenggat lewat → "perlu dijadwal ulang", zona waktu/tahun kabisat/akhir bulan.
+- **Vendor**: satu kandidat `terpilih` per slot (konkurensi dasar), efek pemilihan ke anggaran, turunan status slot.
+- **Akses**: register publik 404; pengguna di luar workspace tidak bisa
+  membaca/mengubah apa pun; pasangan punya akses; `partner` tidak bisa
+  mengeluarkan owner; undangan kedaluwarsa/dipakai ulang ditolak.
+- **Cloudinary** (fake): signature, validasi parameter, verifikasi server,
+  hapus hanya oleh anggota workspace pemilik aset, kegagalan SDK.
+- Template tidak menimpa perubahan pengguna saat dijalankan ulang.
 
 ### 9.2 Frontend
-
-- `tsc --noEmit` tanpa error (strict).
-- ESLint + Prettier lolos.
-- Test komponen/form utama (Vitest + Testing Library) untuk interaksi
-  penting dan state loading/error/empty — bila starter kit belum
-  menyediakannya, tambahkan secukupnya untuk alur kritis, jangan berlebihan.
-- Smoke test E2E dengan Playwright (Chromium biasanya sudah tersedia di
-  environment; jangan menjalankan `playwright install`): homepage → buka
-  paket → kirim konsultasi → login admin → lihat lead. Cek console tanpa
-  error dan tidak ada gambar/link rusak.
-- Audit aksesibilitas otomatis (mis. axe) pada halaman kunci + checklist
-  manual keyboard (Tab, Esc, focus ring) untuk menu, lightbox, dan form.
-- Checklist responsif manual: 360 / 768 / 1024 / 1440 px.
-- Pastikan tidak ada tombol penting yang tidak melakukan apa pun, tautan `#`
-  dekoratif, atau form yang tidak mengirim data.
+- `tsc --noEmit` strict tanpa error; ESLint + Prettier.
+- Test komponen/form kunci (Vitest + Testing Library): form anggaran, pilih
+  vendor, ubah tanggal hari H dengan pratinjau, state loading/error/empty.
+- E2E smoke dengan Playwright (Chromium sudah tersedia; jangan `playwright install`):
+  login → onboarding → isi anggaran → tambah kandidat & pilih → ubah tanggal
+  → dashboard menampilkan angka konsisten. Tanpa error console, tanpa link/gambar rusak.
+- Axe pada halaman kunci + cek keyboard manual; checklist responsif 360/768/1024/1440.
+- Tidak ada tombol yang tidak melakukan apa-apa, tautan `#` dekoratif, atau form yang tidak mengirim data.
 
 ### 9.3 CI
-
-Buat workflow CI (mis. GitHub Actions) yang menjalankan dengan service
-PostgreSQL: `composer install`, migrasi, Pint `--test`, test backend,
-`npm ci`, ESLint, `tsc`, test frontend, dan `npm run build`.
+Workflow (mis. GitHub Actions) dengan service PostgreSQL: install, migrasi,
+Pint `--test`, test backend, `npm ci`, ESLint, `tsc`, test frontend, `npm run build`.
 
 ### 9.4 Sebelum dinyatakan selesai
-
-Jalankan dan laporkan hasil nyata: migrate (+ rollback sanity), seed,
-test suite, lint, typecheck, production build, audit dependency. Perbaiki
-yang gagal. Jika sesuatu tidak bisa dijalankan, catat alasannya — jangan mengklaim lolos.
+Jalankan dan laporkan hasil nyata: migrate (+ rollback sanity), seed/template,
+test, lint, typecheck, build, audit dependency. Yang tidak bisa dijalankan
+dicatat alasannya; jangan mengklaim lolos.
 
 ---
 
 ## 10. Dokumentasi dan deliverables
 
-Buat/perbarui dan pastikan **sesuai kode aktual**:
-
-1. `README.md` — produk, stack + versi, requirements, instalasi, konfigurasi,
-   development, build, test, deployment, akun demo lokal (cara membuatnya).
-2. `.env.example` — semua variabel, tanpa secret/identitas nyata.
-3. `AGENTS.md` — aturan kode (Bagian 0.3), perintah dev/test/lint, konvensi.
-4. `docs/ARCHITECTURE.md` — arsitektur, batas modul, keputusan & trade-off, versi.
-5. `docs/DATABASE.md` — entitas, relasi, rumus budget, aturan status booking.
-6. `docs/CLOUDINARY.md` — setup, alur upload, resource type, media privat,
-   troubleshooting.
-7. `docs/DESIGN_SYSTEM.md` — token, tipografi, komponen, hasil langkah skill UI/UX.
-8. `docs/DEPLOYMENT.md` — checklist deployment, environment, queue worker &
-   scheduler, storage, HTTPS, backup DB, health check (`/up`), migrasi
-   zero-downtime sederhana, rollback, dan opsi hosting SSR bila dipakai.
-9. `docs/ASSETS.md` — sumber & lisensi aset.
-10. `docs/STATUS.md` — daftar fitur: selesai, sebagian, belum, dan yang
-    menunggu kredensial/keputusan bisnis.
-
-Tidak ada dokumentasi yang bertentangan dengan kode.
+Sesuai kode aktual: `README.md` (produk, stack+versi, instalasi, konfigurasi,
+membuat akun pertama, development, test, build, deployment), `.env.example`,
+`AGENTS.md` (aturan 0.3 + perintah dev/test/lint), `docs/ARCHITECTURE.md`,
+`docs/DATABASE.md` (entitas, **rumus anggaran & tabungan**, aturan timeline),
+`docs/CLOUDINARY.md`, `docs/DESIGN_SYSTEM.md`, `docs/DEPLOYMENT.md`
+(hosting hemat biaya, HTTPS, queue worker & scheduler, backup & restore
+`pg_dump`, health check `/up`, rollback), `docs/ASSETS.md`,
+`docs/STATUS.md` (selesai / sebagian / belum / menunggu keputusan),
+`docs/PROGRESS.md` (catatan kerja per milestone).
 
 ---
 
 ## 11. Cara kerja agent — urutan wajib
 
-### Fase 1: Audit
-- Periksa direktori kerja, Git status, versi runtime, tool yang tersedia
-  (PostgreSQL, Node, Chromium), akses jaringan, dan skill `ui-ux-promax`.
-- Baca README/AGENTS.md bila ada. Jangan menimpa pekerjaan pengguna.
-- Tulis ringkasan kondisi & risiko di `docs/PROGRESS.md`.
-
-### Fase 2: Rencana
-- Susun milestone terverifikasi sesuai Bagian 4 (MVP → Fase 2 → Fase 3).
-- Tetapkan schema & design system sebelum membangun banyak halaman.
-- Daftar konfigurasi eksternal (Cloudinary, email, payment) dan penanganan
-  graceful bila belum ada.
-- Jangan bertanya hal non-esensial; pilih default masuk akal dan buat
-  mudah diubah. Bertanya hanya bila keputusan memblokir atau berisiko
-  merusak data/biaya.
-
-### Fase 3: Fondasi
-- Selesaikan Gerbang 1–3 Bagian 0.2 (skill, `MASTER.md`, `DESIGN_SYSTEM.md`) **sebelum** menulis UI.
-- Bootstrap starter kit, design tokens, layout, navigasi, tipografi,
-  komponen reusable, form primitives, pola feedback, halaman error.
-- Auth, role, migrasi, model, policy **sebelum** fitur yang menyimpan data privat.
-- CI dan lint/format sejak awal.
-
-### Fase 4: Fitur end-to-end
-- Per milestone: database → model/policy → controller/request → UI → test → dokumentasi.
-- Urutan: publik → katalog/detail → lead → auth/admin → media Cloudinary →
-  dashboard customer → booking → optimasi → Fase 3.
-- Data yang tampil berasal dari database atau konfigurasi yang jelas — bukan data statis yang berpura-pura dinamis.
-- **Commit kecil dan bermakna** per unit kerja (Conventional Commits:
-  `feat:`, `fix:`, `test:`, `docs:`, `refactor:`). Jangan push ke branch
-  utama langsung dan jangan membuat PR kecuali diminta.
-- Perbarui `docs/PROGRESS.md` di tiap milestone (apa selesai, apa berikutnya, blocker).
-
-### Fase 5: Verifikasi & polish
-- Jalankan semua quality gate (9.4). Periksa console/log, link/gambar rusak,
-  error form, empty/loading state, aksesibilitas, responsif.
-- Gerbang 5 Bagian 0.2: screenshot 4 viewport, review dengan daftar anti-slop (3.2), perbaiki, ulangi.
-- Review keamanan akhir: IDOR, mass assignment, upload, secret scan, header.
-
-### Fase 6: Laporan akhir
-Gunakan format ini:
-1. Fitur yang benar-benar selesai (per fase).
-2. Fitur sebagian/belum selesai dan alasannya.
-3. Keputusan arsitektur penting.
-4. File penting yang dibuat/diubah.
-5. Perintah yang dijalankan beserta hasil **nyata** (test, build, lint, audit, Lighthouse bila ada).
-6. Cara menjalankan dari nol.
-7. Variabel environment yang perlu diisi.
-8. Yang terblokir kredensial/keputusan eksternal.
-9. Risiko, temuan keamanan, dan pekerjaan lanjutan.
-10. Status skill `ui-ux-promax` (dipakai / tidak tersedia).
+1. **Audit**: direktori kerja, Git status, versi runtime, PostgreSQL, Node,
+   Chromium, akses jaringan, skill `ui-ux-promax`. Ringkas di `docs/PROGRESS.md`.
+2. **Rencana**: milestone terverifikasi (MVP → Fase 2 → Fase 3). Jangan
+   bertanya hal non-esensial; pilih default masuk akal yang mudah diubah
+   (semua parameter bisnis ada di Pengaturan, bukan kode).
+3. **Desain dulu**: selesaikan Gerbang 1–3 Bagian 0.2 (skill, `MASTER.md`,
+   `DESIGN_SYSTEM.md`) **sebelum** menulis UI.
+4. **Fondasi**: bootstrap starter kit, matikan registrasi publik, workspace &
+   anggota, Policy/scope, token desain, layout mobile-first, komponen
+   reusable, halaman error, CI.
+5. **Fitur end-to-end** per milestone: database → logika hitung (class murni +
+   test) → controller/request → UI → test → dokumentasi. Urutan: onboarding &
+   pengaturan → anggaran → timeline & tugas → vendor → dashboard → Fase 2.
+   Commit kecil bermakna (Conventional Commits). Jangan push ke branch
+   utama langsung dan jangan membuat PR kecuali diminta.
+6. **Verifikasi & polish**: semua quality gate (9.4), Gerbang 5 (screenshot
+   4 viewport + review anti-slop), review keamanan akhir (IDOR, mass
+   assignment, upload, secret scan, header).
+7. **Laporan akhir**: fitur selesai/sebagian/belum; keputusan arsitektur;
+   file penting; perintah & hasil nyata; cara menjalankan dari nol; env yang
+   perlu diisi; hal terblokir kredensial/keputusan; risiko & temuan
+   keamanan; status skill `ui-ux-promax`.
 
 ---
 
 ## 12. Definition of Done
 
-- [ ] Aplikasi berjalan dari nol mengikuti README.
-- [ ] MVP selesai penuh; Fase 2/3 dilaporkan jujur (selesai/sebagian/belum).
-- [ ] Website publik premium, responsif, konsisten; aset tidak rusak.
-- [ ] Skill `ui-ux-promax` dimuat dan dipakai (atau ketidaktersediaannya dilaporkan); `design-system/*/MASTER.md` dan `docs/DESIGN_SYSTEM.md` ada dan diikuti.
-- [ ] Screenshot 4 viewport tersedia di `docs/screenshots/` dan lolos review anti-slop (3.2).
-- [ ] Fitur inti terhubung ke backend/database, bukan mockup statis.
-- [ ] Auth & authorization berfungsi di backend; matriks role diuji; tidak ada IDOR.
-- [ ] Form punya validasi server, pesan Indonesia, feedback jelas, dan persetujuan data pribadi.
-- [ ] CRUD utama menangani loading/empty/error state.
-- [ ] Cloudinary aman (secret tidak bocor, signed upload, verifikasi server);
-      konfigurasi kosong ditangani dengan jujur; media privat terlindungi.
-- [ ] Migrasi, seeder (demo vs production), factory, dan relasi konsisten; data demo berlabel.
-- [ ] Aksesibilitas WCAG 2.2 AA diperiksa (otomatis + manual keyboard).
-- [ ] `tsc`, lint, test backend & frontend, production build, dan audit
-      dependency dijalankan; hasil dilaporkan apa adanya.
-- [ ] CI terkonfigurasi.
+- [ ] Aplikasi berjalan dari nol mengikuti README; akun pertama bisa dibuat; pasangan bisa diundang.
+- [ ] MVP selesai penuh; Fase 2/3 dilaporkan jujur.
+- [ ] Anggaran, rencana tabungan, timeline (dengan penjadwalan ulang), dan vendor (kandidat, perbandingan, pilihan) bekerja dengan data nyata di database.
+- [ ] Rumus terdokumentasi di `docs/DATABASE.md` dan **diuji** (termasuk kasus tepi).
+- [ ] Tidak ada pendaftaran publik; semua data ter-scope workspace; tidak ada IDOR (diuji).
+- [ ] Data keuangan/dokumen privat; Cloudinary aman (signed, terverifikasi server, secret tidak bocor); konfigurasi kosong ditangani jujur.
+- [ ] Template jelas berlabel "template umum"; tidak ada data vendor/harga/hukum karangan.
+- [ ] Skill `ui-ux-promax` dimuat dan dipakai (atau ketidaktersediaannya dilaporkan); `MASTER.md` & `docs/DESIGN_SYSTEM.md` ada dan diikuti.
+- [ ] Screenshot 4 viewport di `docs/screenshots/` dan lolos review anti-slop (3.2); nyaman dipakai di ponsel.
+- [ ] Aksesibilitas WCAG 2.2 AA diperiksa (otomatis + keyboard); status anggaran tidak hanya bergantung warna.
+- [ ] `tsc`, lint, test backend & frontend, build, audit dependency dijalankan dan dilaporkan apa adanya; CI terkonfigurasi.
+- [ ] Cadangan & ekspor data terdokumentasi dan diuji.
 - [ ] Tidak ada secret/identitas nyata di commit atau `.env.example`.
 - [ ] Kode sumber terbaca (tidak minified), mengikuti Pint/Prettier/ESLint.
-- [ ] README & docs sesuai kode aktual.
-- [ ] Tidak ada klaim palsu tentang test, integrasi, data, atau performa.
+- [ ] README & docs sesuai kode aktual; tidak ada klaim palsu tentang test, integrasi, data, atau performa.
 
 ---
 
 ## Instruksi penutup
 
-Mulai dengan audit lingkungan dan membaca skill `ui-ux-promax`. Lanjutkan
-secara mandiri hingga batas kemampuan lingkungan, mengikuti urutan fase dan
-prioritas MVP. **Utamakan aplikasi yang benar-benar berfungsi, aman, rapi,
-dan indah daripada banyak file atau tampilan demo.** Jangan melakukan
-rewrite besar tanpa alasan teknis, jangan menghapus pekerjaan yang ada, dan
-jangan mengarang hasil verifikasi.
+Mulai dengan audit lingkungan dan memuat skill `ui-ux-promax`. Lanjutkan
+mandiri hingga batas kemampuan lingkungan. **Utamakan aplikasi yang benar-benar
+berfungsi, aman, dan nyaman dipakai dua orang selama dua tahun persiapan,
+daripada banyak fitur atau tampilan demo.** Jangan melakukan rewrite besar
+tanpa alasan teknis dan jangan mengarang hasil verifikasi.
+
