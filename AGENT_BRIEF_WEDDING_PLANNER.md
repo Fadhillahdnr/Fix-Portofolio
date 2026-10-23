@@ -1,6 +1,6 @@
 # END-TO-END IMPLEMENTATION BRIEF — PREMIUM WEDDING PLANNER
 
-> Versi 2 (direvisi). Brief ini ditulis untuk **proyek Laravel baru yang terpisah**
+> Versi 3 (direvisi). Brief ini ditulis untuk **proyek Laravel baru yang terpisah**
 > dari repository portofolio `Fix-Portofolio`. Repository portofolio hanya menjadi
 > referensi pola (lihat Bagian 2.3) dan **tidak boleh diubah**.
 
@@ -28,21 +28,75 @@ belum diimplementasikan **dan** diverifikasi.
   jaringan, environment), tulis itu apa adanya di laporan akhir.
 - Konten demo harus selalu ditandai sebagai demo (lihat Bagian 6.3).
 
-### 0.2 Wajib: skill UI/UX `ui-ux-promax`
+### 0.2 Wajib: skill UI/UX `ui-ux-promax` (gerbang desain, bukan saran)
 
-1. Cari skill **`ui-ux-promax`** di lingkungan agent (mis. `~/.claude/skills`,
-   `.claude/skills`, `.agents/skills`, daftar skill pada sesi). Baca
-   sebelum mendesain atau membuat UI.
-2. Ikuti panduannya: design direction, visual hierarchy, typography,
-   spacing, responsive, accessibility, interaction states, quality checks.
-3. Jika skill **tidak ditemukan**: cari instruksi instalasi resmi yang
-   memang dapat diakses. Jangan mengarang isi skill dan jangan mengklaim
-   telah memakainya. Lanjutkan dengan praktik UI/UX profesional pada brief
-   ini, lalu tulis keterbatasan itu di laporan akhir.
-4. Jangan hanya memasang komponen UI generik. Buat identitas visual yang
-   konsisten dan spesifik untuk wedding planner ini.
-5. Catat hasil langkah ini (ditemukan / tidak, dan keputusan desain yang
-   diambil) di `docs/DESIGN_SYSTEM.md`.
+UI **tidak boleh** ditulis sebelum seluruh gerbang di bawah terpenuhi.
+Tujuannya: hasil akhir terlihat dirancang oleh desainer manusia untuk
+brand ini, bukan keluaran generik AI ("AI slop", lihat Bagian 3.2).
+
+**Gerbang 1 — Temukan & muat skill.**
+1. Cari skill di lingkungan agent dengan nama `ui-ux-promax` **dan**
+   variasi ejaan `ui-ux-pro-max` (periksa daftar skill sesi, `~/.claude/skills`,
+   `.claude/skills`, `.agents/skills`, dan folder plugin). Muat dan baca
+   `SKILL.md` serta berkas pendukungnya (skrip pencarian, data, referensi)
+   sampai selesai sebelum menulis satu pun komponen.
+2. Jika tidak ditemukan, cari instruksi instalasi resmi yang dapat
+   diakses di lingkungan kerja dan pasang hanya lewat jalur resmi itu.
+   Jangan mengarang isi skill, jangan mengklaim telah memakainya.
+3. Jika tetap tidak tersedia: **berhenti sejenak dan laporkan di
+   `docs/PROGRESS.md`**, lalu lanjutkan dengan Bagian 3 sebagai pengganti
+   yang ketat (bukan sebagai alasan untuk bekerja asal-asalan). Tulis
+   keterbatasan ini di laporan akhir.
+
+**Gerbang 2 — Hasilkan design system lewat skill.**
+1. Jalankan alur design-system milik skill (mis. pencarian/rekomendasi
+   desain dengan konteks: "wedding planner, luxury editorial, Indonesia")
+   dan **simpan hasilnya** sebagai sumber kebenaran, mengikuti pola
+   yang sudah dipakai di repo portofolio:
+   - `design-system/<nama-proyek>/MASTER.md` — aturan global (palet,
+     tipografi, spacing, komponen, anti-pattern, checklist pra-pengiriman)
+   - `design-system/<nama-proyek>/pages/<halaman>.md` — override per
+     halaman (landing, katalog, detail, booking, dashboard)
+2. Tetapkan **design dials** (mis. Variance / Motion / Density) dan
+   tuliskan alasannya untuk produk ini. Landing & katalog boleh lebih
+   ekspresif; booking & dashboard lebih tenang dan padat informasi.
+3. Aturan di `MASTER.md` mengikat: bila halaman punya file override, file
+   itu menang. Jika hasil skill bertentangan dengan brief ini, **brief ini
+   menang untuk isi/fungsi dan skill menang untuk keputusan visual**,
+   kecuali skill menyarankan sesuatu yang melanggar aksesibilitas (a11y menang).
+4. Skill sering menghasilkan palet/font default yang cenderung generik
+   atau bertema teknologi. **Verifikasi hasilnya cocok untuk wedding
+   editorial** (hangat, ivory, serif elegan). Jika tidak cocok, override
+   secara sadar di `MASTER.md` dengan alasan tertulis — jangan menerima
+   output mentah begitu saja.
+
+**Gerbang 3 — Rencana visual sebelum kode.**
+Tulis `docs/DESIGN_SYSTEM.md` yang memuat: referensi ke `MASTER.md`,
+konsep visual satu kalimat, pasangan font + alasan, palet + rasio kontras
+terukur, skala spacing, aturan foto (crop, rasio, treatment), daftar
+komponen kustom, aturan motion, dan sketsa tata letak tiap halaman utama
+(deskripsi teks/ASCII: urutan section, titik fokus, ritme, di mana ada
+ruang kosong). Baru setelah ini UI boleh dikerjakan.
+
+**Gerbang 4 — Bangun dari design system, bukan dari kebiasaan.**
+Semua warna, font, spacing, radius, bayangan, dan durasi motion berasal
+dari token (CSS variables/Tailwind theme) yang diturunkan dari `MASTER.md`.
+Tidak ada nilai warna/ukuran acak di komponen.
+
+**Gerbang 5 — Review pra-pengiriman dengan bukti.**
+Sebelum menyatakan UI selesai:
+1. Jalankan checklist "pre-delivery" milik skill (bila ada) pada setiap halaman utama.
+2. Ambil **screenshot nyata** (Playwright/Chromium yang sudah tersedia) pada
+   360, 768, 1024, dan 1440 px untuk: homepage, daftar paket, katalog vendor,
+   detail vendor, form konsultasi, login, dashboard customer, dashboard admin.
+   Simpan di `docs/screenshots/`.
+3. **Lihat sendiri screenshot-nya** (buka gambarnya) dan nilai dengan
+   daftar anti-slop di Bagian 3.2. Perbaiki setiap pelanggaran, ulangi
+   sampai bersih. Catat hasil review (temuan + perbaikan) di `docs/PROGRESS.md`.
+4. Jangan menulis "desain sudah premium" tanpa bukti screenshot dan checklist ini.
+
+Jangan hanya memasang komponen UI generik. Identitas visual harus
+konsisten dan spesifik untuk produk ini.
 
 ### 0.3 Aturan kualitas kode sumber (dibawa dari standar tim)
 
@@ -171,7 +225,7 @@ inspirasi (jangan salin mentah):
 Gaya **editorial luxury wedding**: komposisi lapang, foto berkualitas
 tinggi, tipografi elegan, grid yang matang, detail halus, navigasi sederhana.
 
-Titik awal (boleh disesuaikan secara konsisten dan didokumentasikan):
+Titik awal hipotesis — **keputusan final berasal dari `MASTER.md` hasil skill (Bagian 0.2) dan harus didokumentasikan alasannya**:
 
 - Warna dasar: warm ivory / off-white.
 - Teks: charcoal / warm black dengan kontras aksesibel.
@@ -186,15 +240,77 @@ Titik awal (boleh disesuaikan secara konsisten dan didokumentasikan):
   lengkap dengan mode terang. Mode gelap opsional; jika tidak dibuat,
   pastikan tidak ada komponen yang rusak karena preferensi sistem.
 
-### 3.2 Jangan lakukan
+### 3.2 Anti-AI-slop — daftar larangan yang diperiksa satu per satu
 
-- Tampilan template admin generik tanpa karakter.
-- Gradient mencolok, glassmorphism berlebihan, bayangan berat, terlalu
-  banyak kartu rounded, animasi di setiap elemen, emoji sebagai ikon UI,
-  layout padat.
-- Gambar rusak, URL gambar acak/hotlink tak terverifikasi, atau
-  placeholder kosong di hasil final.
-- Semua halaman terlihat sama. Landing, katalog, form booking, dan dashboard
+"AI slop" = tampilan generik yang terasa dibuat otomatis: aman, rata, dan
+bisa dipasang di brand apa pun. Setiap butir di bawah adalah **item
+review** pada Gerbang 5; satu pelanggaran = belum selesai.
+
+**Tipografi & warna**
+- Dilarang memakai Inter/Roboto/Arial/system-ui sebagai satu-satunya
+  identitas. Heading memakai serif editorial yang dipilih sadar; body sans
+  yang nyaman dibaca. Maksimal 2 keluarga font, dengan hierarki ukuran jelas.
+- Dilarang gradient ungu-biru/neon, gradient teks, "mesh blob" dekoratif,
+  dan palet default Tailwind (`indigo-500`, `slate-900`, `blue-600`) tanpa penyesuaian.
+- Aksen dipakai hemat (CTA, state aktif); mayoritas permukaan netral hangat.
+- Hindari teks abu-abu pucat di atas ivory (kontras rendah) dan putih murni `#fff` + hitam murni `#000`.
+
+**Layout & komposisi**
+- Dilarang pola template berulang: hero tengah + 3 kartu fitur sama besar
+  + deretan ikon + CTA berpita. Variasikan ritme: sesekali asimetris,
+  full-bleed foto, kolom sempit teks, penomoran editorial, caption kecil.
+- Maksimal satu pola "grid kartu" per halaman; jangan membungkus semua
+  hal dalam kartu berborder + bayangan + radius besar.
+- Tentukan **satu titik fokus** per section dan beri ruang kosong yang
+  disengaja. Hindari section yang semuanya berbobot sama.
+- Radius, garis, dan bayangan konsisten dan hemat; bayangan lembut atau tidak ada.
+- Jarak antar section berasal dari skala spacing, bukan angka acak.
+
+**Konten & microcopy**
+- Dilarang copy klise: "Wujudkan pernikahan impian Anda", "Solusi terbaik",
+  "Pengalaman tak terlupakan", "Menyulap momen spesial", dan variasinya.
+  Tulis copy spesifik, hangat, konkret (apa yang dilakukan planner, untuk
+  siapa, bagaimana prosesnya), tanpa klaim yang tidak bisa dibuktikan.
+- Dilarang Lorem ipsum, nama "John & Jane", angka statistik/rating bulat
+  karangan ("500+ pasangan bahagia", "5.0 ★"), dan logo partner palsu.
+- Heading, label tombol, dan empty state memakai kalimat natural, bukan
+  "Get Started"/"Learn More" generik.
+
+**Ikon, gambar, dan dekorasi**
+- Dilarang emoji sebagai ikon UI. Satu set ikon konsisten (satu pustaka,
+  satu stroke width). Jangan memberi ikon pada setiap judul/butir.
+- Dilarang foto stok klise atau gambar rusak/acak; tidak ada placeholder
+  abu-abu kosong di hasil final. Perlakukan foto secara editorial:
+  rasio konsisten, crop disengaja, caption, tanpa overlay gelap tebal.
+- Hindari ornamen berlebihan (bunga/hati/cincin di mana-mana). Ornamen
+  harus langka, halus, dan fungsional.
+- Dilarang glassmorphism berlebihan, glow/neon, dan efek parallax liar.
+
+**Motion**
+- Tanpa animasi masuk (fade-up) pada setiap elemen. Gunakan motion
+  untuk makna: transisi halaman halus, reveal hero, hover galeri, state
+  perubahan. Durasi pendek, easing konsisten, hormati `prefers-reduced-motion`.
+
+**Komponen & dashboard**
+- Dashboard dan admin jangan terlihat seperti template admin bawaan
+  (sidebar gelap + kartu statistik warna-warni). Pakai bahasa visual yang
+  sama dengan situs publik, lebih tenang dan padat; angka tampil dari data nyata.
+- Komponen shadcn/ui **harus dikustomisasi** (radius, warna, tipografi,
+  state fokus) sehingga tidak terlihat seperti tampilan default.
+- Form: label jelas, grup logis, ruang cukup, error dekat input; bukan
+  tumpukan input identik tanpa struktur.
+
+**Uji cepat "slop"** — sebelum selesai, jawab jujur di `docs/PROGRESS.md`:
+1. Jika logo dan teks disembunyikan, apakah halaman ini masih jelas milik
+   brand wedding ini dan bukan template? Jika tidak, desain ulang.
+2. Apakah ada section yang bisa ditukar ke situs SaaS lain tanpa diubah?
+3. Apakah setiap pilihan font/warna/ruang punya alasan di `DESIGN_SYSTEM.md`?
+
+### 3.2a Larangan lain yang tetap berlaku
+
+- Template admin generik tanpa karakter; layout padat tanpa napas.
+- Gambar rusak, hotlink acak tak terverifikasi, URL tak berlisensi.
+- Semua halaman terlihat sama: landing, katalog, booking, dan dashboard
   punya kebutuhan visual berbeda namun satu design system.
 - Mengorbankan aksesibilitas demi estetika.
 
@@ -691,6 +807,7 @@ Tidak ada dokumentasi yang bertentangan dengan kode.
   merusak data/biaya.
 
 ### Fase 3: Fondasi
+- Selesaikan Gerbang 1–3 Bagian 0.2 (skill, `MASTER.md`, `DESIGN_SYSTEM.md`) **sebelum** menulis UI.
 - Bootstrap starter kit, design tokens, layout, navigasi, tipografi,
   komponen reusable, form primitives, pola feedback, halaman error.
 - Auth, role, migrasi, model, policy **sebelum** fitur yang menyimpan data privat.
@@ -709,7 +826,7 @@ Tidak ada dokumentasi yang bertentangan dengan kode.
 ### Fase 5: Verifikasi & polish
 - Jalankan semua quality gate (9.4). Periksa console/log, link/gambar rusak,
   error form, empty/loading state, aksesibilitas, responsif.
-- Pass desain akhir untuk konsistensi dan detail.
+- Gerbang 5 Bagian 0.2: screenshot 4 viewport, review dengan daftar anti-slop (3.2), perbaiki, ulangi.
 - Review keamanan akhir: IDOR, mass assignment, upload, secret scan, header.
 
 ### Fase 6: Laporan akhir
@@ -732,6 +849,8 @@ Gunakan format ini:
 - [ ] Aplikasi berjalan dari nol mengikuti README.
 - [ ] MVP selesai penuh; Fase 2/3 dilaporkan jujur (selesai/sebagian/belum).
 - [ ] Website publik premium, responsif, konsisten; aset tidak rusak.
+- [ ] Skill `ui-ux-promax` dimuat dan dipakai (atau ketidaktersediaannya dilaporkan); `design-system/*/MASTER.md` dan `docs/DESIGN_SYSTEM.md` ada dan diikuti.
+- [ ] Screenshot 4 viewport tersedia di `docs/screenshots/` dan lolos review anti-slop (3.2).
 - [ ] Fitur inti terhubung ke backend/database, bukan mockup statis.
 - [ ] Auth & authorization berfungsi di backend; matriks role diuji; tidak ada IDOR.
 - [ ] Form punya validasi server, pesan Indonesia, feedback jelas, dan persetujuan data pribadi.
